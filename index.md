@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Flocker Social Media Site 
+title: A site for Travelers
 search_exclude: true
-description: Login and explore our social media hub for everything DNHS 
+description: Login and explore more
 hide: true
 menu: nav/home.html
 ---

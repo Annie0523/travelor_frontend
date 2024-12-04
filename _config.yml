@@ -1,9 +1,9 @@
-title: DNHS Flocker
-description: "Social Media for Del Norte High School"
-owner_name: John Mortensen
-github_username: nighthawkcoders
-github_repo: "flocker_frontend" 
-baseurl: "/flocker_frontend"
+title: The Travelers
+description: "A website for the travelers"
+owner_name: Anyi Wang
+github_username: Annie0523
+github_repo: "sprint4_frontend" 
+baseurl: "/sprint4_frontend"
 future: true
 remote_theme: jekyll/minima
 minima:
