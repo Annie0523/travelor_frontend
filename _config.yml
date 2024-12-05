@@ -5,7 +5,7 @@ github_username: Annie0523
 github_repo: "sprint4_frontend" 
 baseurl: "/sprint4_frontend"
 future: true
-remote_theme: jekyll/minima
+remote_theme: pages-themes/cayman@v0.2.0
 minima:
   skin: dark
 # remote_theme: pages-themes/midnight@v0.2.0
