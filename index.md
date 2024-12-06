@@ -1,16 +1,11 @@
 ---
 layout: post
-title: Flocker Social Media Site 
+title: The Travelers
 search_exclude: true
-description: Login and dive into this social media hub made for members of DNHS!
+description: A website for travelers
 hide: true
 menu: nav/home.html
 ---
-
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Travel Platform - Home</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -133,8 +128,6 @@ menu: nav/home.html
       background-color: #0277bd;
     }
   </style>
-</head>
-<body>
 
   <!-- Header Section -->
   <header>
@@ -188,7 +181,4 @@ menu: nav/home.html
   <section class="comment-section">
     <button>Leave a Comment</button>
   </section>
-
-</body>
-</html>
 
