@@ -43,7 +43,7 @@ menu: nav/home.html
     .destinations {
       text-align: center;
       padding: 100px 20px;
-      background-image: url('https://via.placeholder.com/1500x600'); /* Sample Image URL */
+      background-image: url('https://assets.thehansindia.com/h-upload/2023/04/15/1346887-road-trips.jpg/1500x600'); /* Sample Image URL */
       background-size: cover;
       color: white;
       background-position: center;
@@ -52,6 +52,7 @@ menu: nav/home.html
       font-size: 2.5rem;
       margin-bottom: 20px;
       font-weight: 600;
+      color: white;
     }
     .destinations p {
       font-size: 1.2rem;
@@ -141,7 +142,7 @@ menu: nav/home.html
 
   <!-- Destinations Section -->
   <section class="destinations">
-    <h1>Explore the World, One Destination at a Time</h1>
+    <h1>Explore the World, there must be a place thats perfect for you!</h1>
     <p>Your journey begins here. Discover, connect, and share your travel experiences.</p>
     <div class="buttons-container">
       <button>Register</button>
