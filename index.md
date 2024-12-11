@@ -128,6 +128,53 @@ menu: nav/home.html
     .comment-section button:hover {
       background-color: #0277bd;
     }
+    #comment-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    #comment-modal .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      text-align: center;
+    }
+    #comment-modal textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 20px;
+    }
+    #comment-modal button {
+      padding: 10px 20px;
+      background-color: #03a9f4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #comment-modal button:hover {
+      background-color: #0288d1;
+    }
+    .comment-list {
+      margin-top: 20px;
+      padding: 0 50px;
+      list-style-type: none;
+    }
+    .comment-list li {
+      background: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
   </style>
 
   <!-- Header Section -->
@@ -142,10 +189,9 @@ menu: nav/home.html
 
   <!-- Destinations Section -->
   <section class="destinations">
-    <h1>Explore the World, there must be a place thats perfect for you!</h1>
+    <h1>Explore the World, there must be a place that's perfect for you!</h1>
     <p>Your journey begins here. Discover, connect, and share your travel experiences.</p>
     <div class="buttons-container">
-      <button>Register</button>
       <button>Log In</button>
     </div>
   </section>
@@ -180,6 +226,51 @@ menu: nav/home.html
 
   <!-- Leave a Comment Section -->
   <section class="comment-section">
-    <button>Leave a Comment</button>
+    <button onclick="openCommentModal()">Leave a Comment</button>
+    <ul class="comment-list" id="comment-list"></ul>
   </section>
+
+  <!-- Comment Modal -->
+  <div id="comment-modal">
+    <div class="modal-content">
+      <textarea id="comment-input" placeholder="Enter your comment"></textarea>
+      <button onclick="submitComment()">Submit</button>
+      <button onclick="closeCommentModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const commentModal = document.getElementById('comment-modal');
+    const commentInput = document.getElementById('comment-input');
+    const commentList = document.getElementById('comment-list');
+    const comments = [];
+
+    function openCommentModal() {
+      commentModal.style.display = 'flex';
+    }
+
+    function closeCommentModal() {
+      commentModal.style.display = 'none';
+      commentInput.value = '';
+    }
+
+    function submitComment() {
+      const comment = commentInput.value.trim();
+      if (comment) {
+        comments.push(comment);
+        renderComments();
+        closeCommentModal();
+      }
+    }
+
+    function renderComments() {
+      commentList.innerHTML = '';
+      comments.forEach(comment => {
+        const li = document.createElement('li');
+        li.textContent = comment;
+        commentList.appendChild(li);
+      });
+    }
+  </script>
+
 
