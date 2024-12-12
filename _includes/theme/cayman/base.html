@@ -28,10 +28,10 @@
             <a href="{{ my_page.url | relative_url }}" class="btn">{{ my_page.title | escape }}</a>
             {%- endif -%}
       {%- endfor -%}
-      {% if site.github.is_project_page %}
-        <a href="{{ site.github.repository_url }}" class="btn">View on GitHub</a>
-      {% endif %}
+      <a id="loginArea" href="{{ site.baseurl }}/login" class="btn">Login</a>
     </header>
+
+    <script type="module" src="{{ site.baseurl }}/assets/js/api/login.js"></script>
 
     <main id="content" class="main-content" role="main">
       {{ content }}
