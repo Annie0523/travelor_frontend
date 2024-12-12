@@ -2,7 +2,7 @@
 layout: post
 title: The Travelers
 search_exclude: true
-description: A website for travelers
+description: A website for all travelers
 hide: true
 menu: nav/home.html
 ---
