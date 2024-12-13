@@ -6,6 +6,14 @@ menu: nav/home.html
 search_exclude: true
 ---
 <style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
+    }
     .container {
         display: flex;
         justify-content: center;
@@ -19,29 +27,66 @@ search_exclude: true
         flex-direction: column;
         max-width: 800px;
         width: 100%;
-        background-color: #2C3E50;
+        background-color: #ffffff;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        color: #ECF0F1;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: #333;
+    }
+    .form-container h2 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+        color: #0056b3;
     }
     .form-container label {
         margin-bottom: 5px;
+        font-weight: bold;
+        color: #495057;
     }
-    .form-container input, .form-container textarea, .form-container select {
+    .form-container input, 
+    .form-container textarea, 
+    .form-container select {
         margin-bottom: 10px;
         padding: 10px;
         border-radius: 5px;
-        border: none;
+        border: 1px solid #ced4da;
         width: 100%;
+        font-size: 1em;
+        background-color: #f8f9fa;
+        color: #495057;
+    }
+    .form-container input:focus, 
+    .form-container textarea:focus, 
+    .form-container select:focus {
+        outline: none;
+        border-color: #0056b3;
+        box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
     }
     .form-container button {
         padding: 10px;
         border-radius: 5px;
         border: none;
-        background-color: #34495E;
-        color: #ECF0F1;
+        background-color: #0056b3;
+        color: #ffffff;
         cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+    }
+    .form-container button:hover {
+        background-color: #004494;
+    }
+    .data {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: #333;
+        max-width: 800px;
+        width: 100%;
+    }
+    .data .left-side {
+        font-size: 1.2em;
+        color: #0056b3;
     }
 </style>
 
