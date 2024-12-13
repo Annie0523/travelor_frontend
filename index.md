@@ -174,44 +174,6 @@ menu: nav/home.html
       margin-bottom: 10px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    /* Login Modal Style */
-    #login-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-    }
-    #login-modal .modal-content {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      width: 300px;
-      text-align: center;
-    }
-    #login-modal input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 20px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    #login-modal button {
-      padding: 10px 20px;
-      background-color: #03a9f4;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    #login-modal button:hover {
-      background-color: #0288d1;
-    }
   </style>
 
   <!-- Header Section -->
@@ -229,7 +191,7 @@ menu: nav/home.html
     <h1>Explore the World, there must be a place that's perfect for you!</h1>
     <p>Your journey begins here. Discover, connect, and share your travel experiences.</p>
     <div class="buttons-container">
-      <button onclick="openLoginModal()">Log In</button>
+      <button>Log In</button>
     </div>
   </section>
 
@@ -276,22 +238,11 @@ menu: nav/home.html
     </div>
   </div>
 
-  <!-- Login Modal -->
-  <div id="login-modal">
-    <div class="modal-content">
-      <input type="text" id="username" placeholder="Enter Username">
-      <input type="password" id="password" placeholder="Enter Password">
-      <button onclick="login()">Log In</button>
-      <button onclick="closeLoginModal()">Close</button>
-    </div>
-  </div>
-
   <script>
     const commentModal = document.getElementById('comment-modal');
     const commentInput = document.getElementById('comment-input');
     const commentList = document.getElementById('comment-list');
     const comments = [];
-    const loginModal = document.getElementById('login-modal');
 
     function openCommentModal() {
       commentModal.style.display = 'flex';
@@ -318,30 +269,6 @@ menu: nav/home.html
         li.textContent = comment;
         commentList.appendChild(li);
       });
-    }
-
-    function openLoginModal() {
-      loginModal.style.display = 'flex';
-    }
-
-    function closeLoginModal() {
-      loginModal.style.display = 'none';
-      document.getElementById('username').value = '';
-      document.getElementById('password').value = '';
-    }
-
-    function login() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      // For now, we'll just log the credentials to the console (this should be handled by the backend).
-      if (username && password) {
-        console.log('Logging in with', username, password);
-        closeLoginModal();
-        alert('Logged in successfully!');
-      } else {
-        alert('Please enter both username and password');
-      }
     }
   </script>
 
