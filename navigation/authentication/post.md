@@ -322,3 +322,148 @@ search_exclude: true
     // Fetch groups when the page loads
     fetchGroups(); 
 </script>
+
+<script type="module">
+    /**
+     * Handle form submission for adding a post
+     * Add Form Button: Computer handles form submission with request
+     */
+    document.getElementById('postForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        // Extract data from form
+        const title = document.getElementById('title').value;
+        const comment = document.getElementById('comment').value;
+        const channelId = document.getElementById('channel_id').value;
+
+        // Create API payload
+        const postData = {
+            title: title,
+            comment: comment,
+            channel_id: channelId
+        };
+
+        // Trap errors
+        try {
+            // Send POST request to backend, purpose is to write to database
+            const response = await fetch(`${pythonURI}/api/post`, {
+                ...fetchOptions,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add post: ' + response.statusText);
+            }
+
+            // Successful post
+            const result = await response.json();
+            alert('Post added successfully!');
+            document.getElementById('postForm').reset();
+            fetchData(channelId);
+        } catch (error) {
+            // Present alert on error from backend
+            console.error('Error adding post:', error);
+            alert('Error adding post: ' + error.message);
+        }
+    });
+
+    /**
+     * Fetch posts based on selected channel
+     * Handle response: Fetch and display posts
+     */
+    async function fetchData(channelId) {
+        try {
+            const response = await fetch(`${pythonURI}/api/posts/filter`, {
+                ...fetchOptions,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ channel_id: channelId })
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch posts: ' + response.statusText);
+            }
+
+            // Parse the JSON data
+            const postData = await response.json();
+
+            // Extract posts count
+            const postCount = postData.length || 0;
+
+            // Update the HTML elements with the data
+            document.getElementById('count').innerHTML = `<h2>Count ${postCount}</h2>`;
+
+            // Get the details div
+            const detailsDiv = document.getElementById('details');
+            detailsDiv.innerHTML = ''; // Clear previous posts
+
+            // Iterate over the postData and create HTML elements for each item
+            postData.forEach(postItem => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post-item';
+                postElement.innerHTML = `
+                    <h3>${postItem.title}</h3>
+                    <p><strong>Channel:</strong> ${postItem.channel_name}</p>
+                    <p><strong>User:</strong> ${postItem.user_name}</p>
+                    <p>${postItem.comment}</p>
+                    <button class="favorite-button" data-post-id="${postItem.id}" ${postItem.is_favorite ? 'disabled' : ''}>
+                        ${postItem.is_favorite ? 'Favorited' : 'Add to Favorites'}
+                    </button>
+                `;
+                detailsDiv.appendChild(postElement);
+            });
+
+            // Add event listeners to the favorite buttons
+            const favoriteButtons = document.querySelectorAll('.favorite-button');
+            favoriteButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const postId = this.getAttribute('data-post-id');
+                    await toggleFavorite(postId);
+                });
+            });
+            
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    /**
+     * Toggle the favorite state of a post
+     * Send a request to the backend to mark/unmark the post as favorite
+     */
+    async function toggleFavorite(postId) {
+        try {
+            const response = await fetch(`${pythonURI}/api/favorite`, {
+                ...fetchOptions,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ post_id: postId })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to toggle favorite: ' + response.statusText);
+            }
+
+            const result = await response.json();
+            alert(result.message); // Success or error message from the backend
+
+            // After toggling, reload the posts to update the favorite state
+            const channelId = document.getElementById('channel_id').value;
+            fetchData(channelId);
+
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+            alert('Error toggling favorite: ' + error.message);
+        }
+    }
+
+    // Fetch groups when the page loads
+    fetchGroups(); 
+</script>
