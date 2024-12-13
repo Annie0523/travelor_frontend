@@ -174,6 +174,24 @@ menu: nav/home.html
       margin-bottom: 10px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+      .card-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px; /* Increased gap for proper spacing */
+    padding: 0 50px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: scale(1.05); /* Slight zoom effect */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    }
   </style>
 
   <!-- Header Section -->
