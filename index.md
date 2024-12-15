@@ -209,7 +209,7 @@ menu: nav/home.html
     <h1>Explore the World, there must be a place that's perfect for you!</h1>
     <p>Your journey begins here. Discover, connect, and share your travel experiences.</p>
     <div class="buttons-container">
-      <button>Log In</button>
+      <button onclick="location.href='http://127.0.0.1:4887/sprint4_frontend/login'">Log In</button>
     </div>
   </section>
 
