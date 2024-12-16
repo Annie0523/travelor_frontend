@@ -288,6 +288,36 @@ menu: nav/home.html
         commentList.appendChild(li);
       });
     }
+    
+    const API_URL = 'http://localhost:8887/comments';
+
+    async function submitComment() {
+      const comment = commentInput.value.trim();
+      if (comment) {
+        // Send the comment to the backend
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ comment })
+        });
+
+        // Fetch and render comments again
+        await fetchComments();
+        closeCommentModal();
+      }
+    }
+
+    async function fetchComments() {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      comments.length = 0; // Clear the local array
+      comments.push(...data.map(({ comment }) => comment)); // Update local array
+      renderComments();
+    }
+
+    // Fetch and render comments on page load
+    fetchComments();
+
   </script>
 
 
