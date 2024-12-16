@@ -310,10 +310,36 @@ search_exclude: true
                     <p><strong>Channel:</strong> ${postItem.channel_name}</p>
                     <p><strong>User:</strong> ${postItem.user_name}</p>
                     <p>${postItem.comment}</p>
+                    <button class="collect-button" data-post-id="${postItem.id}">Collect</button>
                 `;
                 detailsDiv.appendChild(postElement);
             });
-            
+
+            // Add event listener for collect buttons
+            document.querySelectorAll('.collect-button').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const postId = event.target.getAttribute('data-post-id');
+                    try {
+                        const response = await fetch('/api/post/collect', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ post_id: postId })
+                        });
+                        const result = await response.json();
+                        if (response.ok) {
+                            alert(result.message);
+                            fetchData(); // Refresh the posts
+                        } else {
+                            alert('Failed to update collection status.');
+                        }
+                    } catch (error) {
+                        console.error('Error updating collection status:', error);
+                    }
+                });
+            });
+
         } catch (error) {
             console.error('Error fetching data:', error);
         }

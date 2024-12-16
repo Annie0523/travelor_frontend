@@ -16,3 +16,7 @@ plugins:
 header_pages:
   - navigation/ai.md
   - navigation/authentication/post.md
+
+# GitHub Metadata
+github:
+  token: YOUR_GITHUB_TOKEN
