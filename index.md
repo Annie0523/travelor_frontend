@@ -241,83 +241,76 @@ menu: nav/home.html
     </div>
   </section>
 
-  <!-- Leave a Comment Section -->
-  <section class="comment-section">
-    <button onclick="openCommentModal()">Leave a Comment</button>
-    <ul class="comment-list" id="comment-list"></ul>
-  </section>
+<!-- Leave a Comment Section -->
+<section class="comment-section">
+  <button onclick="openCommentModal()">Leave a Comment</button>
+  <ul class="comment-list" id="comment-list"></ul>
+</section>
 
-  <!-- Comment Modal -->
-  <div id="comment-modal">
-    <div class="modal-content">
-      <textarea id="comment-input" placeholder="Enter your comment"></textarea>
-      <button onclick="submitComment()">Submit</button>
-      <button onclick="closeCommentModal()">Close</button>
-    </div>
+<!-- Comment Modal -->
+<div id="comment-modal">
+  <div class="modal-content">
+    <textarea id="comment-input" placeholder="Enter your comment"></textarea>
+    <button onclick="submitComment()">Submit</button>
+    <button onclick="closeCommentModal()">Close</button>
   </div>
+</div>
 
-  <script>
-    const commentModal = document.getElementById('comment-modal');
-    const commentInput = document.getElementById('comment-input');
-    const commentList = document.getElementById('comment-list');
-    const comments = [];
+<script>
+  const commentModal = document.getElementById('comment-modal');
+  const commentInput = document.getElementById('comment-input');
+  const commentList = document.getElementById('comment-list');
+  const comments = [];
 
-    function openCommentModal() {
-      commentModal.style.display = 'flex';
-    }
+  const API_URL = 'http://localhost:3000/comments';  // Corrected port
 
-    function closeCommentModal() {
-      commentModal.style.display = 'none';
-      commentInput.value = '';
-    }
+  // Open the comment modal
+  function openCommentModal() {
+    commentModal.style.display = 'flex';
+  }
 
-    function submitComment() {
-      const comment = commentInput.value.trim();
-      if (comment) {
-        comments.push(comment);
-        renderComments();
-        closeCommentModal();
-      }
-    }
+  // Close the comment modal
+  function closeCommentModal() {
+    commentModal.style.display = 'none';
+    commentInput.value = '';  // Clear the input field
+  }
 
-    function renderComments() {
-      commentList.innerHTML = '';
-      comments.forEach(comment => {
-        const li = document.createElement('li');
-        li.textContent = comment;
-        commentList.appendChild(li);
+  // Submit the comment to the backend
+  async function submitComment() {
+    const comment = commentInput.value.trim();
+    if (comment) {
+      // Send the comment to the backend
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comment })
       });
+
+      // Fetch and render comments again
+      await fetchComments();
+      closeCommentModal();
     }
-    
-    const API_URL = 'http://localhost:8887/comments';
+  }
 
-    async function submitComment() {
-      const comment = commentInput.value.trim();
-      if (comment) {
-        // Send the comment to the backend
-        await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ comment })
-        });
+  // Fetch and render comments from the backend
+  async function fetchComments() {
+    const response = await fetch(API_URL);
+    const data = await response.json();
+    comments.length = 0;  // Clear the local array
+    comments.push(...data.map(({ comment }) => comment));  // Update local array
+    renderComments();
+  }
 
-        // Fetch and render comments again
-        await fetchComments();
-        closeCommentModal();
-      }
-    }
+  // Render the comments in the list
+  function renderComments() {
+    commentList.innerHTML = '';
+    comments.forEach(comment => {
+      const li = document.createElement('li');
+      li.textContent = comment;
+      commentList.appendChild(li);
+    });
+  }
 
-    async function fetchComments() {
-      const response = await fetch(API_URL);
-      const data = await response.json();
-      comments.length = 0; // Clear the local array
-      comments.push(...data.map(({ comment }) => comment)); // Update local array
-      renderComments();
-    }
-
-    // Fetch and render comments on page load
-    fetchComments();
-
-  </script>
-
-
+  // Fetch and render comments on page load
+  fetchComments();
+</script>
