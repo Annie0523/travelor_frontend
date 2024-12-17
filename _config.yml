@@ -17,7 +17,8 @@ header_pages:
   - navigation/ai.md
   - navigation/authentication/post.md
   - navigation/authentication/developer.md
-
+  - navigation/authentication/weather.md
+  
 # GitHub Metadata
 github:
   token: YOUR_GITHUB_TOKEN
