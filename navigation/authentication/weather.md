@@ -17,4 +17,4 @@ Enter the city name below and get the latest weather information.
 ### Weather Information:
 <div id="result"></div>
 
-<script src="https://raw.githubusercontent.com/annie0523/sprint4_backend/main/weather/script.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/annie0523/sprint4_backend/weather/script.js"></script>
