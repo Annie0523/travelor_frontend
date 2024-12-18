@@ -2,9 +2,26 @@
 layout: post
 title: Meet the Developers
 permalink: /developer
-menu: layouts/developer.html
+menu: nav/home.html
 search_exclude: true
 ---
+<table id="demo" class="table">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>DOB</th>
+            <th>Residence</th>
+            <th>Email</th>
+            <th>Favorite_Videogame</th>
+            <th>Hobbies</th>
+        </tr>
+    </thead>
+    <tbody id="result">
+      <!-- javascript generated data -->
+    </tbody>
+  </table>
+
 <script>
   // prepare HTML result container for new output
   let resultContainer = document.getElementById("result");
