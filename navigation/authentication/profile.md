@@ -32,6 +32,13 @@ show_reading_time: false
      <p id="profile-message" style="color: red;"></p>
    </form>
  </div>
+ <div class="card">
+    <button id="showFavorites">Show My Favorites</button>
+    <div id="favorites" class="data" style="display: none;">
+        <h2>My Favorite Posts</h2>
+        <div id="favoriteDetails"></div>
+    </div>
+</div>
 </div>
 
 <script type="module">
@@ -374,6 +381,43 @@ document.addEventListener('DOMContentLoaded', async function () {
         console.error('Initialization error:', error.message);
         // Handle initialization error gracefully
     }
+});
+
+document.getElementById('showFavorites').addEventListener('click', async function() {
+const favoritesDiv = document.getElementById('favorites');
+const favoriteDetailsDiv = document.getElementById('favoriteDetails');
+favoriteDetailsDiv.innerHTML = ''; // 清空之前的内容
+
+try {
+    const response = await fetch(`${pythonURI}/api/post/collect`, {
+        ...fetchOptions,
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch favorite posts: ' + response.statusText);
+    }
+
+    const favoritePosts = await response.json();
+    favoritePosts.forEach(postItem => {
+        const postElement = document.createElement('div');
+        postElement.className = 'post-item';
+        postElement.innerHTML = `
+            <h3>${postItem.title}</h3>
+            <p><strong>Channel:</strong> ${postItem.channel_name}</p>
+            <p><strong>User:</strong> ${postItem.user_name}</p>
+            <p>${postItem.comment}</p>
+        `;
+        favoriteDetailsDiv.appendChild(postElement);
+    });
+
+    // 显示收藏的帖子
+    favoritesDiv.style.display = 'block';
+} catch (error) {
+    console.error('Error fetching favorite posts:', error);
+}
 });
 
 </script>

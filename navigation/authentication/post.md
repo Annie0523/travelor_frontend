@@ -310,7 +310,9 @@ search_exclude: true
                     <p><strong>Channel:</strong> ${postItem.channel_name}</p>
                     <p><strong>User:</strong> ${postItem.user_name}</p>
                     <p>${postItem.comment}</p>
-                    <button class="collect-button" data-post-id="${postItem.id}">Collect</button>
+                    <button class="collect-button" data-post-id="${postItem.id}">
+                        ${postItem.is_favorite ? 'In The Collect' : 'Collect'}
+                    </button>
                 `;
                 detailsDiv.appendChild(postElement);
             });
@@ -320,20 +322,19 @@ search_exclude: true
                 button.addEventListener('click', async (event) => {
                     const postId = event.target.getAttribute('data-post-id');
                     try {
-                        const response = await fetch('/api/post/collect', {
+                        const response = await fetch(`${pythonURI}/api/post/collect`, {
+                            ...fetchOptions,
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({ post_id: postId })
                         });
-                        const result = await response.json();
-                        if (response.ok) {
-                            alert(result.message);
-                            fetchData(); // Refresh the posts
-                        } else {
-                            alert('Failed to update collection status.');
+                        if (!response.ok) {
+                            throw new Error('Failed to update collection status.');
                         }
+                        // 刷新post状态
+                        fetchData(channelId);
                     } catch (error) {
                         console.error('Error updating collection status:', error);
                     }
