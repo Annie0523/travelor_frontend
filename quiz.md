@@ -7,7 +7,7 @@ menu: nav/home.html
 <!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>10-Question Quiz: Find Your Perfect Vacation</title>
+    <title> Take This 10-Question Quiz!: Find Your Perfect Vacation</title>
     <style>
         body {
             font-family: Arial, sans-serif;
