@@ -241,20 +241,8 @@ menu: nav/home.html
     </div>
   </section>
 
-<!-- Leave a Comment Section -->
-<section class="comment-section">
-  <button onclick="openCommentModal()">Leave a Comment</button>
-  <ul class="comment-list" id="comment-list"></ul>
-</section>
+  
 
-<!-- Comment Modal -->
-<div id="comment-modal">
-  <div class="modal-content">
-    <textarea id="comment-input" placeholder="Enter your comment"></textarea>
-    <button onclick="submitComment()">Submit</button>
-    <button onclick="closeCommentModal()">Close</button>
-  </div>
-</div>
 
 <script>
   const commentModal = document.getElementById('comment-modal');
