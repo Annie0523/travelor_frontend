@@ -264,7 +264,7 @@ menu: nav/home.html
   const commentList = document.getElementById('comment-list');
   const comments = [];
 
-  const API_URL = 'http://localhost:3000/comments';  // Corrected port
+ const API_URL = 'http://10.8.132.92:3000/comments';  // Use your local IP address here
 
   // Open the comment modal
   function openCommentModal() {
