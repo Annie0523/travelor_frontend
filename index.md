@@ -241,8 +241,22 @@ menu: nav/home.html
     </div>
   </section>
 
-  
+<a href="https://annie0523.github.io/sprint4_frontend/quiz" class="quiz-button">Take the Quiz</a>
 
+<!-- Leave a Comment Section -->
+<section class="comment-section">
+  <button onclick="openCommentModal()">Leave a Comment</button>
+  <ul class="comment-list" id="comment-list"></ul>
+</section>
+
+<!-- Comment Modal -->
+<div id="comment-modal">
+  <div class="modal-content">
+    <textarea id="comment-input" placeholder="Enter your comment"></textarea>
+    <button onclick="submitComment()">Submit</button>
+    <button onclick="closeCommentModal()">Close</button>
+  </div>
+</div>
 
 <script>
   const commentModal = document.getElementById('comment-modal');
