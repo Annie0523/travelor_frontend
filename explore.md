@@ -4,7 +4,8 @@ title: Explore
 search_exclude: true
 description: A map to explore
 hide: true
-menu: /explore
+permalink: /explore
+menu: nav/home.html
 ---
 
   <html lang="en">
