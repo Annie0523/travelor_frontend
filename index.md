@@ -264,7 +264,7 @@ menu: nav/home.html
   const commentList = document.getElementById('comment-list');
   const comments = [];
 
- const API_URL = 'http://10.8.132.92:3000/comments';  // Use your local IP address here
+ const API_URL = 'http://localhost:8887/api/comment';  // Use your local IP address here
 
   // Open the comment modal
   function openCommentModal() {
@@ -285,7 +285,7 @@ menu: nav/home.html
       await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ comment })
+        body: JSON.stringify({ "comment": comment })
       });
 
       // Fetch and render comments again
