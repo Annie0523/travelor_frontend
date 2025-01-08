@@ -195,11 +195,13 @@ menu: nav/home.html
   </style>
 
   <!-- Header Section -->
-  <header>
+   <header>
     <div class="logo">TravelSphere</div>
     <nav>
       <button>Home</button>
-      <button>Explore</button>
+      <a href="https://annie0523.github.io/sprint4_frontend/explore">
+  <button>Explore</button>
+      </a>
       <button>Profile</button>
     </nav>
   </header>
