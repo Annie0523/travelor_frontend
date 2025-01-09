@@ -20,6 +20,7 @@ search_exclude: true
 
 <button id="greatwall-btn">Show Great Wall Info</button>
 <button id="deathvalley-btn">Show Death Valley Info</button>
+<button id="zhangjiajie-btn">Show Zhang Jia Jie Info</button>
 <div id="landscape-data"></div>
 
 <script>
@@ -66,5 +67,8 @@ search_exclude: true
 
         document.getElementById('deathvalley-btn').addEventListener('click', (event) => {
             fetchLandscapeData('http://127.0.0.1:8887/api/landscape/deathvalley', event);
+        });
+        document.getElementById('zhangjiajie-btn').addEventListener('click', (event) => {
+            fetchLandscapeData('http://127.0.0.1:8887/api/landscape/zhangjiajie', event);
         });
     </script>
