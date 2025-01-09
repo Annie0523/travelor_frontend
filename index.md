@@ -296,12 +296,13 @@ menu: nav/home.html
     }
   }
 
+
   // Fetch and render comments from the backend
   async function fetchComments() {
     const response = await fetch(API_URL);
     const data = await response.json();
     comments.length = 0;  // Clear the local array
-    comments.push(...data.map(({ comment }) => comment));  // Update local array
+    comments.push(...data);  // Update local array
     renderComments();
   }
 
@@ -318,3 +319,4 @@ menu: nav/home.html
   // Fetch and render comments on page load
   fetchComments();
 </script>
+
