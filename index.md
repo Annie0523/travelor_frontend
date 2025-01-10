@@ -243,7 +243,7 @@ menu: nav/home.html
     </div>
   </section>
 
-<a href="https://annie0523.github.io/sprint4_frontend/quiz" class="quiz-button">Take the Quiz</a>
+<a href="http://127.0.0.1:4887/sprint4_frontend/quiz" class="quiz-button">Take the Quiz</a>
 
 <!-- Leave a Comment Section -->
 <section class="comment-section">

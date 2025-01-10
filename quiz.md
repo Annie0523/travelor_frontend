@@ -4,184 +4,173 @@ title: Flocker Social Media Site
 permalink: /quiz
 menu: nav/home.html
 ---
-<!DOCTYPE html>
+<div id="data-container"></div>
+<div id="error-container" style="color: red; margin-top: 10px;"></div>
+
+<button onclick="fetchData()">Fetch Data</button>
+
+<script>
+function fetchData() {
+    //response = requests.get('http://127.0.0.1:5001')
+    //document.getElementById('result').textContent = `Your perfect travel destination is: ${destination}!`;
+
+        fetch('http://127.0.0.1:5001')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const container = document.getElementById('data-container');
+            container.innerHTML = JSON.stringify(data);  // Display the fetched data
+        })
+        .catch(error => {
+            const errorContainer = document.getElementById('error-container');
+            errorContainer.textContent = 'Failed to fetch data: ' + error.message;
+        });
+}
+</script>
+
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Take This 10-Question Quiz!: Find Your Perfect Vacation</title>
+    <title>Travel Destination Quiz</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #ffecd2, #fcb69f);
         }
         .quiz-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
             width: 100%;
-            max-width: 600px;
+            text-align: center;
         }
-        .question {
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-        .options {
-            list-style: none;
-            padding: 0;
+        h2 {
+            color: #ff6f61;
             margin-bottom: 20px;
         }
-        .options li {
-            margin: 10px 0;
+        .question {
+            margin-bottom: 20px;
         }
-        .options input {
-            margin-right: 10px;
+        label {
+            font-size: 18px;
+            color: #555;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 2px solid #ff6f61;
+            border-radius: 10px;
+            background: #fff0f5;
+            font-size: 16px;
         }
         button {
-            background-color: #4CAF50;
+            background-color: #ff6f61;
             color: white;
-            padding: 10px 15px;
             border: none;
-            border-radius: 5px;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 10px;
             cursor: pointer;
-            display: block;
-            width: 100%;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #e5554f;
         }
-        .result {
+        #result {
+            margin-top: 20px;
             font-size: 20px;
             font-weight: bold;
-            color: #333;
-            display: none;
-            text-align: center;
+            color: #555;
         }
     </style>
 </head>
 <body>
     <div class="quiz-container">
-        <div id="quiz-content">
-            <div class="question" id="question">Question text will go here</div>
-            <ul class="options" id="options"></ul>
-            <button id="next-button">Next</button>
-        </div>
-        <div class="result" id="result">
-            <p>Your perfect vacation destination is:</p>
-            <p id="destination"></p>
-        </div>
+        <h2>✨ Find Your Perfect Travel Destination ✨</h2>
+        <form id="quiz-form">
+            <div class="question">
+                <label for="weather">What is your ideal weather?</label><br>
+                <select id="weather" name="weather">
+                    <option value="warm">Warm and sunny</option>
+                    <option value="cold">Cold and snowy</option>
+                    <option value="mild">Mild and breezy</option>
+                </select>
+            </div>
+            <div class="question">
+                <label for="activity">What kind of activities do you prefer?</label><br>
+                <select id="activity" name="activity">
+                    <option value="adventure">Adventure sports</option>
+                    <option value="relax">Relaxation and spa</option>
+                    <option value="culture">Cultural exploration</option>
+                </select>
+            </div>
+            <div class="question">
+                <label for="budget">What is your budget?</label><br>
+                <select id="budget" name="budget">
+                    <option value="luxury">Luxury</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="budget">Budget-friendly</option>
+                </select>
+            </div>
+            <div class="question">
+                <label for="companions">Who are you traveling with?</label><br>
+                <select id="companions" name="companions">
+                    <option value="solo">Solo</option>
+                    <option value="family">Family</option>
+                    <option value="friends">Friends</option>
+                </select>
+            </div>
+            <div class="question">
+                <label for="scenery">What scenery do you prefer?</label><br>
+                <select id="scenery" name="scenery">
+                    <option value="beach">Beach</option>
+                    <option value="mountains">Mountains</option>
+                    <option value="city">City</option>
+                </select>
+            </div>
+            <button type="button" onclick="getDestination()">Find My Destination</button>
+        </form>
+        <p id="result"></p>
     </div>
 
+<script>
+        function getDestination() {
+            const weather = document.getElementById('weather').value;
+            const activity = document.getElementById('activity').value;
+            const budget = document.getElementById('budget').value;
+            const companions = document.getElementById('companions').value;
+            const scenery = document.getElementById('scenery').value;
 
-    <script>
-        // Quiz Questions
-        const quizQuestions = [
-            { question: "What climate do you prefer?", options: ["Tropical", "Cold", "Moderate"] },
-            { question: "What's your ideal activity?", options: ["Adventure", "Relaxation", "Culture", "Nature"] },
-            { question: "What's your travel budget?", options: ["Low", "Medium", "High"] },
-            { question: "Do you prefer solo travel or group travel?", options: ["Solo", "Group"] },
-            { question: "What’s your preferred cuisine?", options: ["Seafood", "Street Food", "Fine Dining", "Vegetarian"] },
-            { question: "Do you like visiting cities or rural areas?", options: ["Cities", "Rural"] },
-            { question: "Do you enjoy water activities?", options: ["Yes", "No"] },
-            { question: "How important is shopping for you?", options: ["Very Important", "Not Important"] },
-            { question: "Do you enjoy wildlife and safaris?", options: ["Yes", "No"] },
-            { question: "How long would you like your vacation to last?", options: ["A Weekend", "A Week", "Two Weeks", "A Month"] }
-        ];
+            // Embedded Python logic
+            const destination = (function() {
+                const pythonEval = eval(`(() => {
+                    if (weather === 'warm' && scenery === 'beach') return 'Maldives';
+                    if (weather === 'cold' && scenery === 'mountains') return 'Swiss Alps';
+                    if (weather === 'mild' && activity === 'culture') return 'Kyoto, Japan';
+                    if (activity === 'relax' && companions === 'family') return 'Hawaii';
+                    if (budget === 'budget' && scenery === 'city') return 'Bangkok, Thailand';
+                    return 'India!';
+                })()`);
+                return pythonEval;
+            })();
 
-
-        // Current question index
-        let currentQuestionIndex = 0;
-        let answers = []; // Store user answers
-
-
-        // DOM Elements
-        const questionElement = document.getElementById("question");
-        const optionsElement = document.getElementById("options");
-        const nextButton = document.getElementById("next-button");
-        const resultElement = document.getElementById("result");
-        const destinationElement = document.getElementById("destination");
-
-
-        // Load a question
-        function loadQuestion() {
-            // Clear previous options
-            optionsElement.innerHTML = "";
-
-
-            // Get current question
-            const currentQuestion = quizQuestions[currentQuestionIndex];
-            questionElement.textContent = currentQuestion.question;
-
-
-            // Add options to the UI
-            currentQuestion.options.forEach((option, index) => {
-                const li = document.createElement("li");
-                li.innerHTML = `<input type="radio" name="option" value="${option}" id="option${index}">
-                                <label for="option${index}">${option}</label>`;
-                optionsElement.appendChild(li);
-            });
+            document.getElementById('result').textContent = `Your perfect travel destination is: ${destination}!`;
         }
-
-
-        // Go to the next question
-        nextButton.addEventListener("click", () => {
-            // Get the selected answer
-            const selectedOption = document.querySelector('input[name="option"]:checked');
-            if (!selectedOption) {
-                alert("Please select an option!");
-                return;
-            }
-
-
-            // Store the selected answer
-            answers.push(selectedOption.value);
-
-
-            // Move to the next question
-            currentQuestionIndex++;
-
-
-            // Check if we've reached the end of the quiz
-            if (currentQuestionIndex < quizQuestions.length) {
-                loadQuestion();
-            } else {
-                showResult();
-            }
-        });
-
-
-        // Show the final result
-        function showResult() {
-            // Hide the quiz content
-            document.getElementById("quiz-content").style.display = "none";
-
-
-            // Determine a result (simple logic for now)
-            if (answers.includes("Tropical") && answers.includes("Relaxation")) {
-                destinationElement.textContent = "Bali, Indonesia - Beaches, sunshine, and affordable luxury!";
-            } else if (answers.includes("Cold") && answers.includes("Adventure")) {
-                destinationElement.textContent = "Switzerland - Ski resorts and beautiful alpine views!";
-            } else if (answers.includes("Moderate") && answers.includes("Culture")) {
-                destinationElement.textContent = "Italy - Rich history, art, and delicious food!";
-            } else if (answers.includes("Nature") && answers.includes("Wildlife")) {
-                destinationElement.textContent = "South Africa - Stunning safaris and natural parks!";
-            } else {
-                destinationElement.textContent = "Your dream destination is waiting! Explore the world!";
-            }
-
-
-            // Show the result
-            resultElement.style.display = "block";
-        }
-
-
-        // Load the first question
-        loadQuestion();
     </script>
-
-    
+</body>
+</html>
