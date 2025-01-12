@@ -1,11 +1,10 @@
 ---
-layout: post 
-title: WeatherStatic
+layout: post
+title: Weatherstatic
 permalink: /weatherstatic
 menu: nav/home.html
 search_exclude: true
 ---
-
 
 <style>
     #weather-data {
