@@ -2,12 +2,11 @@
 layout: post
 title: Explore
 search_exclude: true
-description: A map to explore
+description: A map with some popular cities
 hide: true
 permalink: /explore
 menu: nav/home.html
 ---
-
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -39,9 +38,9 @@ menu: nav/home.html
       border-left: 1px solid #ccc;
     }
     #filter-section {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
-    .wonder-checkbox {
+    .city-checkbox {
       margin: 5px 0;
       display: block;
     }
@@ -77,39 +76,45 @@ menu: nav/home.html
   <div id="sidebar">
     <h2>Filters</h2>
 
+<div id="filter-section">
+  <button id="satellite-toggle" style="margin-top: 20px; padding: 10px; font-size: 14px;">
+    Toggle Satellite View
+  </button>
+</div>
+
   <!-- ================== FILTERS ================== -->
   <!-- The Cities Filter -->
   <div id="filter-section">
       <div class="filter-label">Cities</div>
-      <label class="wonder-checkbox">
-        <input type="checkbox" class="wonder-option" value="tokyo" checked/> Tokyo
+      <label class="city-checkbox">
+        <input type="checkbox" class="city-option" value="tokyo" checked/> Tokyo
       </label>
-      <label class="wonder-checkbox">
-        <input type="checkbox" class="wonder-option" value="mumbai" checked/> Mumbai
+      <label class="city-checkbox">
+        <input type="checkbox" class="city-option" value="mumbai" checked/> Mumbai
       </label>
-      <label class="wonder-checkbox">
-        <input type="checkbox" class="wonder-option" value="cairo" checked/> Cairo
+      <label class="city-checkbox">
+        <input type="checkbox" class="city-option" value="cairo" checked/> Cairo
       </label>
-      <label class="wonder-checkbox">
-        <input type="checkbox" class="wonder-option" value="lagos" checked/> Lagos
+      <label class="city-checkbox">
+        <input type="checkbox" class="city-option" value="lagos" checked/> Lagos
       </label>
-      <label class="wonder-checkbox">
-        <input type="checkbox" class="wonder-option" value="london" checked/> London
+      <label class="city-checkbox">
+        <input type="checkbox" class="city-option" value="london" checked/> London
       </label>
-      <label class="wonder-checkbox">
-        <input type="checkbox" class="wonder-option" value="paris" checked/> Paris
+      <label class="city-checkbox">
+        <input type="checkbox" class="city-option" value="paris" checked/> Paris
       </label>
-      <label class="wonder-checkbox">
-        <input type="checkbox" class="wonder-option" value="new_york_city" checked/> New York City
+      <label class="city-checkbox">
+        <input type="checkbox" class="city-option" value="new_york_city" checked/> New York City
       </label>
-      <label class="wonder-checkbox">
-        <input type="checkbox" class="wonder-option" value="mexico_city" checked/> Mexico City
+      <label class="city-checkbox">
+        <input type="checkbox" class="city-option" value="mexico_city" checked/> Mexico City
       </label>
-      <label class="wonder-checkbox">
-        <input type="checkbox" class="wonder-option" value="sao_paulo" checked/> Salo Paulo
+      <label class="city-checkbox">
+        <input type="checkbox" class="city-option" value="sao_paulo" checked/> Sao Palo
       </label>
-      <label class="wonder-checkbox">
-        <input type="checkbox" class="wonder-option" value="buenos_aires" checked/> Buenos Aires
+      <label class="city-checkbox">
+        <input type="checkbox" class="city-option" value="buenos_aires" checked/> Buenos Aires
       </label>
     </div>
 
@@ -147,36 +152,61 @@ menu: nav/home.html
 <!-- ================== MAP & SCRIPT ================== -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  // Global variables
   let map;
-  // Store all { wonder, marker } so we can filter them
-  let wondersMarkers = [];
-  // Store the red pin (user-selected marker)
+  let citysMarkers = [];
   let userSelectedMarker = null;
-// 1. Initialize the Leaflet map
-  function initLeafletMap() {
-    map = L.map('map').setView([20, 0], 2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
-    }).addTo(map);
-// Set up filter listeners
-    document.querySelectorAll('.wonder-option').forEach(checkbox => {
-      checkbox.addEventListener('change', applyFilters);
-    });
-    document.getElementById('category-filter').addEventListener('change', applyFilters);
-    document.getElementById('location-filter').addEventListener('input', applyFilters);
-    document.getElementById('interest-filter').addEventListener('input', applyFilters);
-// Single click on map to place a red pin
-    map.on("click", (e) => {
-      placeSelectedMarker(e.latlng);
-    });
-// After map init, fetch data from your backend
-    fetchDataFromBackend();
-  }
-// 2. Fetch data from the backend API & create markers
+  const interestFilter = document.getElementById('interest-filter');
+  const interestDisplay = document.createElement('div');
+  interestDisplay.style.display = 'none';
+  interestDisplay.style.fontSize = '20px';
+  interestDisplay.style.color = '#555';
+  interestFilter.parentNode.appendChild(interestDisplay);
+ let allInterests = [];
+  let interestIndex = 0;
+  let interestInterval;
+// 1. The Leaflet map code 
+// Map layers ex(satelite)
+const defaultLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 20,
+  attribution: '© OpenStreetMap contributors'
+});
+const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+  subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+  maxZoom: 20,
+  attribution: '© Google Maps'
+});
+// Track current map layer
+let currentLayer = defaultLayer;
+function initLeafletMap() {
+  map = L.map('map', {
+    layers: [defaultLayer] // Start with the default layer
+  }).setView([20, 0], 2);
+// Add satellite view toggle functionality
+  document.getElementById('satellite-toggle').addEventListener('click', () => {
+    if (map.hasLayer(defaultLayer)) {
+      map.removeLayer(defaultLayer);
+      map.addLayer(satelliteLayer);
+    } else {
+      map.removeLayer(satelliteLayer);
+      map.addLayer(defaultLayer);
+    }
+  });
+// Existing event listeners and functionality
+  document.querySelectorAll('.city-option').forEach(checkbox => {
+    checkbox.addEventListener('change', applyFilters);
+  });
+  document.getElementById('category-filter').addEventListener('change', applyFilters);
+  document.getElementById('location-filter').addEventListener('input', applyFilters);
+  document.getElementById('interest-filter').addEventListener('input', applyFilters);
+map.on("click", (e) => {
+    placeSelectedMarker(e.latlng);
+  });
+fetchDataFromBackend();
+  fetchInterestsForHover();
+}
+// Fetching data from the backend API using fetch command
   function fetchDataFromBackend() {
-    // Change /cities to the correct endpoint on your Flask app
-    fetch('http://127.0.0.1:5000/cities')
+    fetch('http://127.0.0.1:8887/cities')
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok: ' + response.status);
@@ -184,12 +214,9 @@ menu: nav/home.html
         return response.json();
       })
       .then(data => {
-        // data should be an array of wonders (city objects) from your backend
-        // Clear existing markers from the map (if any)
-        wondersMarkers.forEach(({ marker }) => marker.remove());
-        wondersMarkers = [];
-// Create new markers from the fetched data
-        data.forEach((wonder) => {
+        citysMarkers.forEach(({ marker }) => marker.remove());
+        citysMarkers = [];
+        data.forEach((city) => {
           const blueIcon = L.icon({
             iconUrl: generateSVGPin('#4169E1'),
             iconSize: [25, 41],
@@ -197,22 +224,36 @@ menu: nav/home.html
             popupAnchor: [1, -34],
             shadowSize: [41, 41]
           });
-const marker = L.marker(wonder.position, {
-            title: wonder.name,
+          const marker = L.marker(city.position, {
+            title: city.name,
             icon: blueIcon
           }).addTo(map);
-wondersMarkers.push({ wonder, marker });
+          citysMarkers.push({ city, marker });
         });
-// Once we have new markers, apply filters immediately
         applyFilters();
       })
       .catch(error => {
         console.error('Error fetching data from backend:', error);
       });
   }
+// Fetch interests by hovering over interest
+  function fetchInterestsForHover() {
+    return fetch('http://127.0.0.1:8887/cities')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Backend not reachable');
+        }
+        return response.json();
+      })
+      .then(data => {
+        allInterests = data.flatMap(city => city.interest.split(', ').map(interest => interest.trim()));
+      })
+      .catch(error => {
+        console.error('Error fetching interests:', error);
+      });
+  }
 // 3. Helper function to generate an inline SVG data URI (a colored pin)
   function generateSVGPin(colorHex) {
-    // Must be in backticks so it’s a string, not raw HTML
     const svg = `
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
         <path fill="${colorHex}" d="M168 0C75.3 0 0 75.3 0 168C0 297 168
@@ -220,10 +261,10 @@ wondersMarkers.push({ wonder, marker });
           240c-39.8 0-72-32.2-72-72 0-39.8 32.2-72 72-72 39.8 0 72 32.2
           72 72C240 207.8 207.8 240 168 240z"/>
       </svg>
-    `;
+`;
     return "data:image/svg+xml;base64," + btoa(svg);
   }
-// 4. Place/Move the user-selected marker (red pin)
+// 4. Place a red pin on the map
   function placeSelectedMarker(location) {
     if (userSelectedMarker) {
       userSelectedMarker.setLatLng(location);
@@ -244,32 +285,44 @@ wondersMarkers.push({ wonder, marker });
     document.getElementById("selected-location").innerText =
       `Lat: ${location.lat.toFixed(4)}, Lng: ${location.lng.toFixed(4)}`;
   }
-// 5. Apply filters based on user input
+// Show cycling interests when hovering
+  function startCyclingInterests() {
+    if (allInterests.length === 0) return;
+interestDisplay.style.display = 'block';
+    interestInterval = setInterval(() => {
+      interestDisplay.innerText = allInterests[interestIndex];
+      interestIndex = (interestIndex + 1) % allInterests.length;
+    }, 1000);
+  }
+// Stop cycling interests
+  function stopCyclingInterests() {
+    interestDisplay.style.display = 'none';
+    clearInterval(interestInterval);
+  }
+// Attach hover event listeners to interest filter
+  interestFilter.addEventListener('mouseenter', startCyclingInterests);
+  interestFilter.addEventListener('mouseleave', stopCyclingInterests);
+// 6. Apply filters
   function applyFilters() {
-    const activeWonders = Array.from(document.querySelectorAll('.wonder-option:checked'))
+    const activecitys = Array.from(document.querySelectorAll('.city-option:checked'))
       .map(cb => cb.value.toLowerCase());
-const categorySelected = document.getElementById('category-filter').value.toLowerCase();
+    const categorySelected = document.getElementById('category-filter').value.toLowerCase();
     const locationInput = document.getElementById('location-filter').value.toLowerCase();
     const interestInput = document.getElementById('interest-filter').value.toLowerCase();
-wondersMarkers.forEach(({ wonder, marker }) => {
+citysMarkers.forEach(({ city, marker }) => {
       let isVisible = true;
-// City checkbox filter (based on wonder.value)
-      if (!activeWonders.includes(wonder.value.toLowerCase())) {
+      if (!activecitys.includes(city.value.toLowerCase())) {
         isVisible = false;
       }
-// Category filter
-      if (categorySelected && wonder.category.toLowerCase() !== categorySelected) {
+      if (categorySelected && city.category.toLowerCase() !== categorySelected) {
         isVisible = false;
       }
-// Location filter (search by name)
-      if (locationInput && !wonder.name.toLowerCase().includes(locationInput)) {
+      if (locationInput && !city.name.toLowerCase().includes(locationInput)) {
         isVisible = false;
       }
-// Interest filter
-      if (interestInput && !wonder.interest.toLowerCase().includes(interestInput)) {
+      if (interestInput && !city.interest.toLowerCase().includes(interestInput)) {
         isVisible = false;
       }
-// Show or hide the marker on the map
       if (isVisible) {
         marker.addTo(map);
       } else {
@@ -277,8 +330,7 @@ wondersMarkers.forEach(({ wonder, marker }) => {
       }
     });
   }
-// 6. Initialize when the window loads
-  window.onload = initLeafletMap;
+window.onload = initLeafletMap;
 </script>
 </body>
 </html>
