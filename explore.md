@@ -180,7 +180,7 @@ let currentLayer = defaultLayer;
 function initLeafletMap() {
   map = L.map('map', {
     layers: [defaultLayer] // Start with the default layer
-  }).setView([20, 0], 2);
+  }).setView([22, 0], 2);
 // Add satellite view toggle functionality
   document.getElementById('satellite-toggle').addEventListener('click', () => {
     if (map.hasLayer(defaultLayer)) {
