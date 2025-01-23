@@ -24,6 +24,32 @@ search_exclude: true
         .landscape-item p {
             margin: 5px 0;
         }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label, input, textarea, button {
+            margin-bottom: 10px;
+        }
+        input, textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
     </style>
 
 <div class="container">
@@ -122,7 +148,6 @@ search_exclude: true
 
                 const result = await response.json();
                 alert('Landscape added successfully!');
-                // Optionally, you can reset the form or update the UI here
                 document.getElementById('landscapeForm').reset();
             } catch (error) {
                 console.error('Error:', error);
