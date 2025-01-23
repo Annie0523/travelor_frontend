@@ -82,3 +82,55 @@ search_exclude: true
         // Fetch and display landscapes when the page loads
         fetchLandscapes();
     </script>
+
+<div class="container">
+        <h1>Add New Landscape</h1>
+        <form id="landscapeForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country" required>
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" required>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+        <button type="submit">Add Landscape</button>
+        </form>
+    </div>
+
+<script>
+        document.getElementById('landscapeForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const country = document.getElementById('country').value;
+            const city = document.getElementById('city').value;
+            const description = document.getElementById('description').value;
+
+            try {
+                const response = await fetch('http://127.0.0.1:8887/api/landscapes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, country, city, description })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add landscape');
+                }
+
+                const result = await response.json();
+                alert('Landscape added successfully!');
+                // Optionally, you can reset the form or update the UI here
+                document.getElementById('landscapeForm').reset();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while adding the landscape.');
+            }
+        });
+
+        // Fetch and display landscapes when the page loads
+        fetchLandscapes();
+    </script>
+
