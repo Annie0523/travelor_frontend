@@ -7,6 +7,7 @@ hide: true
 menu: nav/home.html
 ---
 
+
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -194,6 +195,7 @@ menu: nav/home.html
     }
   </style>
 
+
   <!-- Header Section -->
    <header>
     <div class="logo">TravelSphere</div>
@@ -206,6 +208,7 @@ menu: nav/home.html
     </nav>
   </header>
 
+
   <!-- Destinations Section -->
   <section class="destinations">
     <h1>Explore the World, there must be a place that's perfect for you!</h1>
@@ -214,6 +217,7 @@ menu: nav/home.html
       <button onclick="location.href='http://127.0.0.1:4887/sprint4_frontend/login'">Log In</button>
     </div>
   </section>
+
 
   <!-- Featured Destinations Section -->
   <section>
@@ -243,13 +247,108 @@ menu: nav/home.html
     </div>
   </section>
 
+
 <a href="http://127.0.0.1:4887/sprint4_frontend/quiz" class="quiz-button">Take the Quiz</a>
+
+
+<section class="vacation-section">
+  <button type="submit" onclick="fetchVacations()">My Saved Vacations</button>
+</section>
+<!-- <button type="submit" onclick="fetchVacations()">Add New Vacation Spot</button>  -->
+<ul id="vacationList"></ul>
+
+<style>
+  button {
+    background-color: #0288d1;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin: 10px;
+  }
+
+  button:hover {
+    background-color: #0277bd;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  button:active {
+    background-color: #01579b;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transform: translateY(2px);
+  }
+</style>
+
+<script>
+  const vacations = [];
+  const VACATION_URL = 'http://localhost:8887/api/vacations';
+  const vacationList = document.getElementById('vacationList');
+
+
+async function fetchVacations() {
+    try {
+
+
+        const response = await fetch(VACATION_URL);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        
+        // Access the vacation data from the response
+        const vacationData = data.vacations || [];
+        
+        // Clear existing vacations and add new ones
+        vacations.length = 0;
+        vacations.push(...vacationData);
+
+
+const secondHeading = document.createElement('h1');
+secondHeading.textContent = `Vacation Data: ${JSON.stringify(data)}`; // Convert the data object to a string
+document.body.insertBefore(secondHeading, document.body.firstChild); // Insert it at the top of the page
+
+  
+        renderVacations(); // Call function to render vacation data
+    } catch (error) {
+        console.error("Failed to fetch vacations:", error);
+    }
+}
+
+
+  function renderVacations() {
+
+      vacationList.innerHTML = ''; // Clear previous list
+      vacations.forEach(vacation => {
+          const li = document.createElement('li');
+      // Render vacation properties
+      
+      li.innerHTML = `
+        <strong>${vacation.name}</strong> <br>
+        Country: ${vacation.country} <br>
+        Climate: ${vacation.climate} <br>
+        <hr>
+      `;
+      vacationList.appendChild(li);
+
+      });
+  }
+
+  // Optionally call fetchVacations to load data on page load
+  // fetchVacations();
+</script>
+
+
+
 
 <!-- Leave a Comment Section -->
 <section class="comment-section">
   <button onclick="openCommentModal()">Leave a Comment</button>
   <ul class="comment-list" id="comment-list"></ul>
 </section>
+
 
 <!-- Comment Modal -->
 <div id="comment-modal">
@@ -260,24 +359,29 @@ menu: nav/home.html
   </div>
 </div>
 
+
 <script>
   const commentModal = document.getElementById('comment-modal');
   const commentInput = document.getElementById('comment-input');
   const commentList = document.getElementById('comment-list');
   const comments = [];
 
+
  const API_URL = 'http://localhost:8887/api/comment';  // Use your local IP address here
+
 
   // Open the comment modal
   function openCommentModal() {
     commentModal.style.display = 'flex';
   }
 
+
   // Close the comment modal
   function closeCommentModal() {
     commentModal.style.display = 'none';
     commentInput.value = '';  // Clear the input field
   }
+
 
   // Submit the comment to the backend
   async function submitComment() {
@@ -290,11 +394,14 @@ menu: nav/home.html
         body: JSON.stringify({ "comment": comment })
       });
 
+
       // Fetch and render comments again
       await fetchComments();
       closeCommentModal();
     }
   }
+
+
 
 
   // Fetch and render comments from the backend
@@ -306,6 +413,7 @@ menu: nav/home.html
     renderComments();
   }
 
+
   // Render the comments in the list
   function renderComments() {
     commentList.innerHTML = '';
@@ -316,7 +424,11 @@ menu: nav/home.html
     });
   }
 
+
   // Fetch and render comments on page load
   fetchComments();
 </script>
+
+
+
 
