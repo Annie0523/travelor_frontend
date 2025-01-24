@@ -250,6 +250,8 @@ menu: nav/home.html
 
 <a href="http://127.0.0.1:4887/sprint4_frontend/quiz" class="quiz-button">Take the Quiz</a>
 
+<button onclick="window.location.href='https://annie0523.github.io/sprint4_frontend/vacations'">🌍 Explore Vacations</button>
+
 
 
 <!-- Leave a Comment Section -->
