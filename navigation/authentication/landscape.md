@@ -70,9 +70,17 @@ search_exclude: true
     </div>
 
 <script>
+        const pythonURI = (() => {
+            if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+                return "http://127.0.0.1:8402"; 
+            } else {
+                return "https://flask2025.nighthawkcodingsociety.com";
+            }
+        })();
+
         async function fetchLandscapes() {
             try {
-                const response = await fetch('http://127.0.0.1:8887//api/landscapes'); 
+                const response = await fetch(`${pythonURI}/api/landscapes`); 
                 if (!response.ok) {
                     throw new Error('Failed to fetch landscapes: ' + response.statusText);
                 }
@@ -127,35 +135,32 @@ search_exclude: true
 <script>
         document.getElementById('landscapeForm').addEventListener('submit', async function(event) {
             event.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const country = document.getElementById('country').value;
-            const city = document.getElementById('city').value;
-            const description = document.getElementById('description').value;
+
+            const formData = {
+                name: document.getElementById('name').value,
+                country: document.getElementById('country').value,
+                city: document.getElementById('city').value,
+                description: document.getElementById('description').value
+            };
 
             try {
-                const response = await fetch('http://127.0.0.1:8887/api/landscapes', {
+                const response = await fetch(`${pythonURI}/api/landscapes`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ name, country, city, description })
+                    body: JSON.stringify(formData)
                 });
 
-                if (!response.ok) {
-                    throw new Error('Failed to add landscape');
+                if (response.ok) {
+                    alert('Landscape added successfully!');
+                    document.getElementById('landscapeForm').reset();
+                } else {
+                    alert('Failed to add landscape.');
                 }
-
-                const result = await response.json();
-                alert('Landscape added successfully!');
-                document.getElementById('landscapeForm').reset();
             } catch (error) {
                 console.error('Error:', error);
                 alert('An error occurred while adding the landscape.');
             }
         });
-
-        // Fetch and display landscapes when the page loads
-        fetchLandscapes();
     </script>
-

@@ -21,4 +21,4 @@ header_pages:
   
 # GitHub Metadata
 github:
-  token: YOUR_GITHUB_TOKEN
+  token: YOUR_GENERATED_GITHUB_TOKEN
