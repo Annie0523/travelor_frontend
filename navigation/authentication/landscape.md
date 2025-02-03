@@ -69,53 +69,49 @@ search_exclude: true
         </table>
     </div>
 
-<script>
-        const pythonURI = (() => {
-            if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-                return "http://127.0.0.1:8402"; 
-            } else {
-                return "https://flask2025.nighthawkcodingsociety.com";
+<script type="module">
+    import config from './config.js';
+
+    const pythonURI = config.API_BASE_URL;
+
+    async function fetchLandscapes() {
+        try {
+            const response = await fetch(`${pythonURI}/api/landscapes`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch landscapes: ' + response.statusText);
             }
-        })();
-
-        async function fetchLandscapes() {
-            try {
-                const response = await fetch(`${pythonURI}/api/landscapes`); 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch landscapes: ' + response.statusText);
-                }
-                const landscapeData = await response.json();
-                displayLandscapes(landscapeData);
-            } catch (error) {
-                console.error('Error fetching landscapes:', error);
-            }
+            const landscapeData = await response.json();
+            displayLandscapes(landscapeData);
+        } catch (error) {
+            console.error('Error fetching landscapes:', error);
         }
+    }
 
-        function displayLandscapes(landscapeData) {
-            const resultContainer = document.getElementById('result');
-            resultContainer.innerHTML = ''; // Clear previous content
+    function displayLandscapes(landscapeData) {
+        const resultContainer = document.getElementById('result');
+        resultContainer.innerHTML = ''; // Clear previous content
 
-         landscapeData.forEach(landscape => {
-                const tr = document.createElement('tr');
-                const name = document.createElement('td');
-                const country = document.createElement('td');
-                const city = document.createElement('td');
-                const description = document.createElement('td');
-                name.innerHTML = landscape.name; 
-                country.innerHTML = landscape.country; 
-                city.innerHTML = landscape.city; 
-                description.innerHTML = landscape.description; 
-                tr.appendChild(name);
-                tr.appendChild(country);
-                tr.appendChild(city);
-                tr.appendChild(description);
-                resultContainer.appendChild(tr);
-            });
-        }
+        landscapeData.forEach(landscape => {
+            const tr = document.createElement('tr');
+            const name = document.createElement('td');
+            const country = document.createElement('td');
+            const city = document.createElement('td');
+            const description = document.createElement('td');
+            name.innerHTML = landscape.name; 
+            country.innerHTML = landscape.country; 
+            city.innerHTML = landscape.city; 
+            description.innerHTML = landscape.description; 
+            tr.appendChild(name);
+            tr.appendChild(country);
+            tr.appendChild(city);
+            tr.appendChild(description);
+            resultContainer.appendChild(tr);
+        });
+    }
 
-        // Fetch and display landscapes when the page loads
-        fetchLandscapes();
-    </script>
+    // Fetch and display landscapes when the page loads
+    fetchLandscapes();
+</script>
 
 <div class="container">
         <h1>Add New Landscape</h1>
