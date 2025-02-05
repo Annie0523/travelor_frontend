@@ -7,11 +7,14 @@ hide: true
 permalink: /explore
 menu: nav/home.html
 ---
+
+
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <title>Good Cities to Travel to around the world (Leaflet + OSM)</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
 
   <style>
     /* Original page styling */
@@ -65,6 +68,7 @@ menu: nav/home.html
       margin-top: 20px;
     }
 
+
     /* ADDED: Make #selected-location text red, white background, light border, some padding */
     #selected-location {
       margin-top: 10px;
@@ -74,6 +78,7 @@ menu: nav/home.html
       border: 1px solid #ccc;   /* light border */
       padding: 10px;            /* spacing inside */
     }
+
 
     /* Button styling for dynamic colors */
     #location-btn {
@@ -97,6 +102,7 @@ menu: nav/home.html
       background-color: #0275d8;
     }
 
+
     /* ----------- New CSS for Orange Toggle Satellite Button ---------- */
     #satellite-toggle {
       margin-top: 20px;
@@ -112,6 +118,7 @@ menu: nav/home.html
     #satellite-toggle:hover {
       background-color: #ff9500; /* slightly different orange on hover */
     }
+
 
     /* ----------- Dropdown for City Checkboxes ----------- */
     .dropdown {
@@ -150,6 +157,7 @@ menu: nav/home.html
       display: block; /* utility to toggle display on/off */
     }
 
+
     /* ADDED: a big box around name, value, position, category, interest, and add location */
     #big-form {
       border: 2px solid #ccc;     /* border around the form */
@@ -161,23 +169,27 @@ menu: nav/home.html
 </head>
 <body>
 
+
 <div id="container">
   <!-- The Map -->
   <div id="map"></div>
+
 
   <!-- The Sidebar / Filter Options -->
   <div id="sidebar">
     <h2>Filters</h2>
 
-<div id="filter-section">
+
+  <div id="filter-section">
       <!-- Orange Satellite Toggle Button -->
       <button id="satellite-toggle">
         Toggle Satellite View
       </button>
     </div>
 
-<!-- ================== FILTERS ================== -->
-<!-- Replaced the old city checkboxes with a dropdown -->
+
+  <!-- ================== FILTERS ================== -->
+  <!-- Replaced the old city checkboxes with a dropdown -->
   <div id="filter-section">
       <div class="filter-label">Cities</div>
       <div class="dropdown">
@@ -217,8 +229,9 @@ menu: nav/home.html
       </div>
     </div>
 
-<!-- Category Filter -->
-<div id="filter-section">
+
+  <!-- Category Filter -->
+  <div id="filter-section">
       <div class="filter-label">Category</div>
       <select id="category-filter">
         <option value="">--Select Category--</option>
@@ -231,35 +244,43 @@ menu: nav/home.html
       </select>
     </div>
 
+
   <!-- Location Filter -->
   <div id="filter-section">
       <div class="filter-label">Location</div>
       <input type="text" id="location-filter" placeholder="Enter location or city..."/>
     </div>
 
+
   <!-- Interest Tag Filter -->
-   <div id="filter-section">
+  <div id="filter-section">
       <div class="filter-label">Interest Tags</div>
       <input type="text" id="interest-filter" placeholder="ex: Empire State, Anime"/>
     </div>
 
-   <!-- Selected Marker Info -->
+
+  <!-- Selected Marker Info -->
   <div id="selected-location">No location selected yet.</div>
 
+
   <!-- ================== ADD/UPDATE LOCATION FORM ================== -->
-   <!-- EVERYTHING in "big-form" is same lines, just wrapped in this new div -->
+  <!-- EVERYTHING in "big-form" is same lines, just wrapped in this new div -->
   <div id="filter-section">
       <div id="big-form">
         <h3 id="form-title">Add a New Location</h3>
 
+
   <label for="explore-name">Name:</label>
         <input type="text" id="explore-name" placeholder="e.g. Chicago" />
+
 
   <label for="explore-value">Value:</label>
         <input type="text" id="explore-value" placeholder="e.g. chicago" />
 
+
   <label for="explore-position">Position (lat, lng):</label>
         <input type="text" id="explore-position" placeholder="e.g. 41.8781, -87.6298" />
+
 
   <label for="explore-category">Category:</label>
         <select id="explore-category">
@@ -272,15 +293,19 @@ menu: nav/home.html
           <option value="Modern">Modern</option>
         </select>
 
+
   <label for="explore-interest">Interest:</label>
         <input type="text" id="explore-interest" placeholder="e.g. CHICAGO: deep-dish, windy city" />
 
-<button id="location-btn" class="gray">Add Location</button>
+
+  <button id="location-btn" class="gray">Add Location</button>
       </div>
     </div>
 
+
   </div><!-- End #sidebar -->
 </div><!-- End #container -->
+
 
 <!-- ================== MAP & SCRIPT ================== -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -311,6 +336,19 @@ const nameInput = document.getElementById('explore-name');
   const interestInput = document.getElementById('explore-interest');
   const locationBtn = document.getElementById('location-btn');
   const formTitle = document.getElementById('form-title');
+// ----------------------- SETUP pythonURI -----------------------
+  // Instead of calling CORS anywhere or some local proxy, we define a direct URI:
+  const pythonURI = (() => {
+    // Adjust your domain/port if needed
+    if (location.hostname === "localhost") {
+      return "http://localhost:8887";
+    } else if (location.hostname === "127.0.0.1") {
+      return "http://127.0.0.1:8887";
+    } else {
+      // Change to your actual deployed Flask or Python server
+      return "https://flask2025.nighthawkcodingsociety.com";
+    }
+  })();
 function initLeafletMap() {
     map = L.map('map', {
       layers: [defaultLayer]
@@ -361,7 +399,7 @@ document.getElementById('satellite-toggle').addEventListener('click', () => {
 // ----------------------- BACKEND COMMUNICATION -----------------------
   // 1) GET all Explore data
   function fetchDataFromBackend() {
-    fetch('http://127.0.0.1:8887/api/explores')
+    fetch(`${pythonURI}/api/explores`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Error fetching data from /api/explores');
@@ -390,12 +428,11 @@ const customIcon = L.icon({
             shadowSize: [41, 41]
           });
 const marker = L.marker([lat, lng], { icon: customIcon });
-// Build popup content:
-          // Always show a red "Delete" and a blue "Update" button
+// Build popup content: Always show a red "Delete" and a blue "Update" button
           let popupHtml = `
             <b>${city.name}</b><br>
             ${city.interest}<br><br>
-            <button class="delete-btn" data-id="${city.id}" 
+            <button class="delete-btn" data-id="${city.id}"
               style="background-color:red;color:white;border:none;padding:5px;cursor:pointer;">
               Delete
             </button>
@@ -404,7 +441,7 @@ const marker = L.marker([lat, lng], { icon: customIcon });
               Update
             </button>
           `;
-marker.bindPopup(popupHtml);
+          marker.bindPopup(popupHtml);
           marker.addTo(map);
 // On marker click, fill "Position" field
           marker.on('click', () => {
@@ -434,7 +471,7 @@ applyFilters();
   }
 // 2) GET interests
   function fetchExploreInterests() {
-    fetch('http://127.0.0.1:8887/api/explores')
+    fetch(`${pythonURI}/api/explores`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Error fetching interests from /api/explores');
@@ -465,7 +502,7 @@ const requestBody = {
       category: categorySelect.value.trim(),
       interest: interestInput.value.trim()
     };
-fetch('http://127.0.0.1:8887/api/explores', {
+fetch(`${pythonURI}/api/explores`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody)
@@ -496,7 +533,7 @@ const requestBody = {
       category: categorySelect.value.trim(),
       interest: interestInput.value.trim()
     };
-fetch('http://127.0.0.1:8887/api/explores', {
+fetch(`${pythonURI}/api/explores`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody)
@@ -521,7 +558,7 @@ fetch('http://127.0.0.1:8887/api/explores', {
 // 4) DELETE
   function doDeleteCity(cityId) {
     if (!confirm("Are you sure you want to delete this location?")) return;
-fetch('http://127.0.0.1:8887/api/explores', {
+fetch(`${pythonURI}/api/explores`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: cityId })
@@ -566,11 +603,13 @@ formTitle.textContent = "Add a New Location";
     updateAddButtonState();
   }
 function validateForm() {
-    if (!nameInput.value.trim() ||
-        !valueInput.value.trim() ||
-        !positionInput.value.trim() ||
-        !categorySelect.value.trim() ||
-        !interestInput.value.trim()) {
+    if (
+      !nameInput.value.trim() ||
+      !valueInput.value.trim() ||
+      !positionInput.value.trim() ||
+      !categorySelect.value.trim() ||
+      !interestInput.value.trim()
+    ) {
       alert("Please fill in all fields.");
       return false;
     }
@@ -627,7 +666,7 @@ function startCyclingInterests() {
       interestIndex = (interestIndex + 1) % allInterests.length;
     }, 1000);
   }
-  function stopCyclingInterests() {
+function stopCyclingInterests() {
     interestDisplay.style.display = 'none';
     clearInterval(interestInterval);
   }
@@ -683,7 +722,8 @@ if (nameFilled && valueFilled && posFilled && catFilled && interestFilled) {
       locationBtn.classList.add("gray");
     }
   }
-window.onload = initLeafletMap;
+// add uri function and also change the link to the port
+  window.onload = initLeafletMap;
 </script>
 </body>
 </html>
