@@ -390,7 +390,48 @@ search_exclude: true
       });
   }
 
-  // 7. APPEND UNITS
+  // 7. UPDATE WEATHER
+    function updateWeather(weatherId) {
+    const newName = prompt("Enter new city name:");
+    const newTemperature = prompt("Enter new temperature:");
+    const newFeelsLike = prompt("Enter new feels-like temperature:");
+    const newHumidity = prompt("Enter new humidity:");
+    const newPressure = prompt("Enter new pressure:");
+    const newWindSpeed = prompt("Enter new wind speed:");
+    const newWindDirection = prompt("Enter new wind direction:");
+
+    if (newName && newTemperature && newFeelsLike && newHumidity && newPressure && newWindSpeed && newWindDirection) {
+        fetch(`http://127.0.0.1:8887/api/weathers/${weatherId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: newName,
+                temperature: newTemperature,
+                feelslike: newFeelsLike,
+                humidity: newHumidity,
+                pressure: newPressure,
+                windspeed: newWindSpeed,
+                winddirection: newWindDirection
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const resultContainer = document.getElementById('resultContainer');
+            if (data) {
+                resultContainer.innerHTML = `<p>Weather updated successfully: ${data.name}, ${data.temperature}°C</p>`;
+                document.getElementById('getAllWeatherButton').click(); // Refresh the weather list
+            }
+        })
+        .catch(error => {
+            const resultContainer = document.getElementById('resultContainer');
+            resultContainer.innerHTML = `<p>Error updating weather: ${error.message}</p>`;
+        });
+    }
+  }
+  
+  // 8. APPEND UNITS
   document
     .getElementById("tempUnitBtn")
     .addEventListener("click", () => appendUnit("w-temperature", "°C"));
