@@ -271,31 +271,33 @@ menu: nav/home.html
 </div>
 
 
-<script>
+<script type="module">
+  import { pythonURI } from './assets/js/api/config.js';
+
   const commentModal = document.getElementById('comment-modal');
   const commentInput = document.getElementById('comment-input');
   const commentList = document.getElementById('comment-list');
   const comments = [];
 
 
- const API_URL = 'http://localhost:8887/api/comment';  // Use your local IP address here
+ const API_URL = pythonURI+'/api/comment';  // Use your local IP address here
 
 
   // Open the comment modal
-  function openCommentModal() {
+  window.openCommentModal = function() {
     commentModal.style.display = 'flex';
   }
 
 
   // Close the comment modal
-  function closeCommentModal() {
+  window.closeCommentModal = function() {
     commentModal.style.display = 'none';
     commentInput.value = '';  // Clear the input field
   }
 
 
   // Submit the comment to the backend
-  async function submitComment() {
+  window.submitComment = async function() {
     const comment = commentInput.value.trim();
     if (comment) {
       // Send the comment to the backend
@@ -316,7 +318,7 @@ menu: nav/home.html
 
 
   // Fetch and render comments from the backend
-  async function fetchComments() {
+  window.fetchComments = async function() {
     const response = await fetch(API_URL);
     const data = await response.json();
     comments.length = 0;  // Clear the local array
@@ -326,7 +328,7 @@ menu: nav/home.html
 
 
   // Render the comments in the list
-  function renderComments() {
+  window.renderComments = function() {
     commentList.innerHTML = '';
     comments.forEach(comment => {
       const li = document.createElement('li');

@@ -74,7 +74,7 @@ search_exclude: true
 
     const pythonURI = config.API_BASE_URL;
 
-    async function fetchLandscapes() {
+    window.fetchLandscapes = async function() {
         try {
             const response = await fetch(`${pythonURI}/api/landscapes`);
             if (!response.ok) {
