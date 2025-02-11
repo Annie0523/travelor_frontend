@@ -129,34 +129,46 @@ search_exclude: true
     </div>
 
 <script>
-        document.getElementById('landscapeForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
+    // Ensure pythonURI is defined in the global scope
+    import config from './config.js';';
+    const pythonURI = config.API_BASE_URL;    const pythonURI = config.API_BASE_URL;
 
-            const formData = {
-                name: document.getElementById('name').value,
-                country: document.getElementById('country').value,
-                city: document.getElementById('city').value,
-                description: document.getElementById('description').value
-            };
+    document.getElementById('landscapeForm').addEventListener('submit', async function(event) {r('submit', async function(event) {
+        event.preventDefault();
 
-            try {
-                const response = await fetch(`${pythonURI}/api/landscapes`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
+        const formData = {
+            name: document.getElementById('name').value,me: document.getElementById('name').value,
+            country: document.getElementById('country').value,            country: document.getElementById('country').value,
+            city: document.getElementById('city').value, document.getElementById('city').value,
+            description: document.getElementById('description').value
+        };
 
-                if (response.ok) {
-                    alert('Landscape added successfully!');
-                    document.getElementById('landscapeForm').reset();
-                } else {
-                    alert('Failed to add landscape.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while adding the landscape.');
+        try {
+            const response = await fetch(`${pythonURI}/api/landscapes`, {onse = await fetch(`${pythonURI}/api/landscapes`, {
+                method: 'POST',
+                headers: {ders: {
+                    'Content-Type': 'application/json'                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                alert('Landscape added successfully!');lert('Landscape added successfully!');
+                document.getElementById('landscapeForm').reset();lementById('landscapeForm').reset();
+                // Optionally, fetch and display the updated list of landscapesy the updated list of landscapes
+                window.fetchLandscapes();
+            } else { else {
+                alert('Failed to add landscape.');     alert('Failed to add landscape.');
             }
-        });
-    </script>
+        } catch (error) {        } catch (error) {
+
+
+
+
+
+
+</script>    });        }            alert('An error occurred while adding the landscape.');            console.error('Error:', error);            console.error('Error:', error);
+            alert('An error occurred while adding the landscape.');
+        }
+    });
+</script>
