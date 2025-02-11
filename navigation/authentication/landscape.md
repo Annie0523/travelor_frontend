@@ -70,7 +70,7 @@ search_exclude: true
     </div>
 
 <script type="module">
-    import config from './config.js';
+    import config from './assets/js/api/config.js';
 
     const pythonURI = config.API_BASE_URL;
 
@@ -110,7 +110,7 @@ search_exclude: true
     }
 
     // Fetch and display landscapes when the page loads
-    fetchLandscapes();
+    window.fetchLandscapes();
 </script>
 
 <div class="container">

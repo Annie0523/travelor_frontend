@@ -25,6 +25,13 @@ export const fetchOptions = {
         'X-Origin': 'client' // New custom header to identify source
     },
 };
+
+const config = {
+    API_BASE_URL: 'http://localhost:8402' // 确保这个URL是正确的
+};
+
+export default config;
+
 // User Login Function 
 export function login(options) {
         // Modify the options to use the POST method and include the request body.
