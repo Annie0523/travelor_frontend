@@ -201,7 +201,7 @@ menu: nav/home.html
     <div class="logo">TravelSphere</div>
     <nav>
       <button>Home</button>
-      <a href="https://annie0523.github.io/sprint4_frontend/explore">
+      <a href="https://annie0523.github.io/travelor_frontend/explore">
   <button>Explore</button>
       </a>
       <button>Profile</button>
@@ -214,7 +214,7 @@ menu: nav/home.html
     <h1>Explore the World, there must be a place that's perfect for you!</h1>
     <p>Your journey begins here. Discover, connect, and share your travel experiences.</p>
     <div class="buttons-container">
-      <button onclick="location.href='http://127.0.0.1:4887/sprint4_frontend/login'">Log In</button>
+      <button onclick="location.href='https://annie0523.github.io/travelor_frontend/login'">Log In</button>
     </div>
   </section>
 
@@ -248,9 +248,9 @@ menu: nav/home.html
   </section>
 
 
-<a href="http://127.0.0.1:4887/sprint4_frontend/quiz" class="quiz-button">Take the Quiz</a>
+<a href="http://127.0.0.1:4887/travelor_frontend/quiz" class="quiz-button">Take the Quiz</a>
 
-<button onclick="window.location.href='https://annie0523.github.io/sprint4_frontend/vacations'">🌍 Explore Vacations</button>
+<button onclick="window.location.href='https://annie0523.github.io/travelor_frontend/vacations'">🌍 Explore Vacations</button>
 
 
 
