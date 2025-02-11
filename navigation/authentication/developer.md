@@ -27,7 +27,7 @@ search_exclude: true
   let resultContainer = document.getElementById("result");
   
   // prepare URL
-  url = "http://127.0.0.1:8887/api/students";
+  url = "http://127.0.0.1:8402/api/students";
 
   // set options for cross origin header request
   let options = {

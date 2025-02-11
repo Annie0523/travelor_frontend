@@ -1,7 +1,7 @@
 title: The Travelers
 description: "A website for all travelers"
-github_repo: "sprint4_frontend" 
-baseurl: "/sprint4_frontend"
+github_repo: "travelor_frontend" 
+baseurl: "/travelor_frontend"
 future: true
 remote_theme: pages-themes/cayman@v0.2.0
 minima:
