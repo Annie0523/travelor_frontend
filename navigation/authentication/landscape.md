@@ -70,9 +70,7 @@ search_exclude: true
     </div>
 
 <script type="module">
-    import config from './config.js';
-
-    const pythonURI = config.API_BASE_URL;
+    import { pythonURI, fetchOptions } from './config.js';
 
     window.fetchLandscapes = async function() {
         try {
