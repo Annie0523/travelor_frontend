@@ -201,7 +201,7 @@ menu: nav/home.html
     <div class="logo">TravelSphere</div>
     <nav>
       <button>Home</button>
-      <a href="https://annie0523.github.io/sprint4_frontend/explore">
+      <a href="https://annie0523.github.io/travelor_frontend/explore">
   <button>Explore</button>
       </a>
       <button>Profile</button>
