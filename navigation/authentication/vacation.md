@@ -142,10 +142,11 @@ search_exclude: true
     </div>
 </div>
 
-<script>
+<script type="module">
+    import {pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     async function fetchVacations() {
         try {
-            const response = await fetch('http://127.0.0.1:8887/api/vacations');
+            const response = await fetch(`${pythonURI}/api/vacations`, fetchOptions)
             if (!response.ok) {
                 throw new Error('Failed to fetch vacations: ' + response.statusText);
             }
@@ -155,45 +156,36 @@ search_exclude: true
             console.error('Error fetching vacations:', error);
         }
     }
-
     function displayVacations(vacations) {
         const vacationGrid = document.getElementById('vacationGrid');
         vacationGrid.innerHTML = '';
-
         vacations.forEach(vacation => {
             const card = document.createElement('div');
             card.className = 'vacation-card';
-
             card.innerHTML = `
                 <h2>${vacation.name}</h2>
                 <p><strong>Climate:</strong> ${vacation.climate}</p>
                 <p><strong>Country:</strong> ${vacation.country}</p>
             `;
-
             vacationGrid.appendChild(card);
         });
     }
-
     document.getElementById('vacationForm').addEventListener('submit', async function(event) {
         event.preventDefault();
-
         const name = document.getElementById('name').value;
         const climate = document.getElementById('climate').value;
         const country = document.getElementById('country').value;
-
         try {
-            const response = await fetch('http://127.0.0.1:8887/api/vacations', {
+            const response = await fetch(`${pythonURI}/api/vacations`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ name, climate, country })
             });
-
             if (!response.ok) {
                 throw new Error('Failed to add vacation');
             }
-
             alert('Vacation added successfully!');
             document.getElementById('vacationForm').reset();
             fetchVacations();
@@ -202,6 +194,7 @@ search_exclude: true
             alert('An error occurred while adding the vacation.');
         }
     });
-
     fetchVacations();
 </script>
+
+
