@@ -250,7 +250,7 @@ menu: nav/home.html
 
 <a href="http://127.0.0.1:4887/travelor_frontend/quiz" class="quiz-button">Take the Quiz</a>
 
-<button onclick="window.location.href='http://127.0.0.1:4887/travelor_frontend/vacations'">🌍 Explore Vacations</button>
+<button onclick="window.location.href='https://annie0523.github.io/travelor_frontend/vacations'">🌍 Explore Vacations</button>
 
 
 
