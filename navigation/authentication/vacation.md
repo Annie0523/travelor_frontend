@@ -143,10 +143,11 @@ search_exclude: true
 </div>
 
 <script type="module">
-    import {pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import {pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js'
+    const URL = pythonURI;
     async function fetchVacations() {
         try {
-            const response = await fetch(`${pythonURI}/api/vacations`, fetchOptions)
+            const response = await fetch(`${URL}/api/vacations`, fetchOptions)
             if (!response.ok) {
                 throw new Error('Failed to fetch vacations: ' + response.statusText);
             }
@@ -176,7 +177,7 @@ search_exclude: true
         const climate = document.getElementById('climate').value;
         const country = document.getElementById('country').value;
         try {
-            const response = await fetch(`${pythonURI}/api/vacations`, {
+            const response = await fetch(`${URL}/api/vacations`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
