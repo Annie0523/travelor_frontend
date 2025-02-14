@@ -233,11 +233,10 @@ menu: nav/home.html
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script type="module">
-    // Import the API configuration (URI and any fetch options) from your config module.
+    // Import the API configuration (URI and fetch options) from your config module.
     import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     const URL = pythonURI; // Use the imported API URI
-// Fetch options will be used for GET requests.
-    let map;
+let map;
     let citysMarkers = [];
     let userSelectedMarker = null;
     let editingCityId = null;
