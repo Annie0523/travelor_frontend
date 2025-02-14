@@ -12,10 +12,15 @@ menu: nav/home.html
 <head>
   <meta charset="UTF-8"/>
   <title>Good Cities to Travel to around the world (Leaflet + OSM)</title>
+
+  <!-- Leaflet core stylesheet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <!-- Added preload and stylesheet for Google Fonts with crossorigin attribute -->
-  <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" crossorigin="anonymous">
+
+  <!-- Keep preload but remove explicit crossorigin to avoid credential-mode mismatch -->
+  <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style">
+  <!-- Likewise remove crossorigin from the actual stylesheet link -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap">
+
   <style>
     html, body {
       margin: 0;
@@ -231,28 +236,48 @@ menu: nav/home.html
     </div>
   </div>
 
+  <!-- Leaflet core library -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
   <script type="module">
     // Import the API configuration (URI and fetch options) from your config module.
     import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    const URL = pythonURI; // Use the imported API URI
-let map;
+
+    // Force-omit credentials to avoid "must be 'true'" CORS errors
+    // If fetchOptions includes credentials, remove or override them here.
+    const safeFetchOptions = {
+      ...fetchOptions,
+      credentials: 'omit'
+    };
+
+    // Also ensure we don't cause double slashes in URLs:
+    const baseURL = pythonURI.endsWith('/')
+      ? pythonURI.slice(0, -1)
+      : pythonURI;
+
+    const URL = baseURL; // final server base
+
+    let map;
     let citysMarkers = [];
     let userSelectedMarker = null;
     let editingCityId = null;
+
     const knownCityValues = [
       "tokyo", "mumbai", "cairo", "lagos", "london",
       "paris", "new_york_city", "mexico_city", "sao_paulo", "buenos_aires"
     ];
+
     let allInterests = [];
     let interestIndex = 0;
     let interestInterval;
+
     const interestFilter = document.getElementById('interest-filter');
     const interestDisplay = document.createElement('div');
     interestDisplay.style.display = 'none';
     interestDisplay.style.fontSize = '20px';
     interestDisplay.style.color = '#555';
     interestFilter.parentNode.appendChild(interestDisplay);
+
     const nameInput = document.getElementById('explore-name');
     const valueInput = document.getElementById('explore-value');
     const positionInput = document.getElementById('explore-position');
@@ -260,10 +285,12 @@ let map;
     const interestInput = document.getElementById('explore-interest');
     const locationBtn = document.getElementById('location-btn');
     const formTitle = document.getElementById('form-title');
-function initLeafletMap() {
+
+    function initLeafletMap() {
       map = L.map('map', {
         layers: [defaultLayer]
       }).setView([20, 0], 2);
+
       document.getElementById('satellite-toggle').addEventListener('click', () => {
         if (map.hasLayer(defaultLayer)) {
           map.removeLayer(defaultLayer);
@@ -273,12 +300,14 @@ function initLeafletMap() {
           map.addLayer(defaultLayer);
         }
       });
+
       document.querySelectorAll('.city-option').forEach(checkbox => {
         checkbox.addEventListener('change', applyFilters);
       });
       document.getElementById('category-filter').addEventListener('change', applyFilters);
       document.getElementById('location-filter').addEventListener('input', applyFilters);
       document.getElementById('interest-filter').addEventListener('input', applyFilters);
+
       const cityDropdownBtn = document.getElementById('city-dropdown-btn');
       const cityDropdownContent = document.getElementById('city-dropdown-content');
       cityDropdownBtn.addEventListener('click', () => {
@@ -291,18 +320,23 @@ function initLeafletMap() {
           }
         }
       });
+
       map.on("click", (e) => {
         placeSelectedMarker(e.latlng);
       });
+
       fetchDataFromBackend();
       fetchExploreInterests();
       locationBtn.addEventListener('click', submitLocation);
+
       [nameInput, valueInput, positionInput, categorySelect, interestInput].forEach(elem => {
         elem.addEventListener('input', updateAddButtonState);
       });
     }
-function fetchDataFromBackend() {
-      fetch(`${URL}/api/explores`, fetchOptions)
+
+    function fetchDataFromBackend() {
+      // Using safeFetchOptions with credentials omitted
+      fetch(`${URL}/api/explores`, safeFetchOptions)
         .then(response => {
           if (!response.ok) {
             throw new Error('Error fetching data from /api/explores');
@@ -312,14 +346,17 @@ function fetchDataFromBackend() {
         .then(data => {
           citysMarkers.forEach(({ marker }) => map.removeLayer(marker));
           citysMarkers = [];
+
           data.forEach(city => {
             const coords = city.position.split(',').map(str => parseFloat(str.trim()));
             const lat = coords[0];
             const lng = coords[1];
+
             let colorHex = "#0000FF";
             if (!knownCityValues.includes(city.value.toLowerCase())) {
               colorHex = "#00FF00";
             }
+
             const customIcon = L.icon({
               iconUrl: generateSVGPin(colorHex),
               iconSize: [25, 41],
@@ -327,6 +364,7 @@ function fetchDataFromBackend() {
               popupAnchor: [1, -34],
               shadowSize: [41, 41]
             });
+
             const marker = L.marker([lat, lng], { icon: customIcon });
             let popupHtml = `
               <b>${city.name}</b><br>
@@ -338,6 +376,7 @@ function fetchDataFromBackend() {
                 Update
               </button>
             `;
+
             marker.bindPopup(popupHtml);
             marker.addTo(map);
             marker.on('click', () => {
@@ -364,8 +403,9 @@ function fetchDataFromBackend() {
         })
         .catch(error => console.error('Error fetching data:', error));
     }
-function fetchExploreInterests() {
-      fetch(`${URL}/api/explores`, fetchOptions)
+
+    function fetchExploreInterests() {
+      fetch(`${URL}/api/explores`, safeFetchOptions)
         .then(response => {
           if (!response.ok) {
             throw new Error('Error fetching interests from /api/explores');
@@ -379,15 +419,18 @@ function fetchExploreInterests() {
         })
         .catch(error => console.error('Error fetching interests:', error));
     }
-function submitLocation() {
+
+    function submitLocation() {
       if (editingCityId) {
         updateLocation();
       } else {
         addLocation();
       }
     }
-function addLocation() {
+
+    function addLocation() {
       if (!validateForm()) return;
+
       const requestBody = {
         name: nameInput.value.trim(),
         value: valueInput.value.trim(),
@@ -395,9 +438,11 @@ function addLocation() {
         category: categorySelect.value.trim(),
         interest: interestInput.value.trim()
       };
+
       fetch(`${URL}/api/explores`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // No need for credentials here
         body: JSON.stringify(requestBody)
       })
         .then(response => {
@@ -416,8 +461,10 @@ function addLocation() {
           alert('Failed to add the new location. Check console for details.');
         });
     }
-function updateLocation() {
+
+    function updateLocation() {
       if (!validateForm()) return;
+
       const requestBody = {
         id: editingCityId,
         name: nameInput.value.trim(),
@@ -426,6 +473,7 @@ function updateLocation() {
         category: categorySelect.value.trim(),
         interest: interestInput.value.trim()
       };
+
       fetch(`${URL}/api/explores`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -448,8 +496,10 @@ function updateLocation() {
           alert('Failed to update the location. Check console for details.');
         });
     }
-function doDeleteCity(cityId) {
+
+    function doDeleteCity(cityId) {
       if (!confirm("Are you sure you want to delete this location?")) return;
+
       fetch(`${URL}/api/explores`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
@@ -470,19 +520,22 @@ function doDeleteCity(cityId) {
           alert('Failed to delete the location. Check console for details.');
         });
     }
-function startEditCity(city) {
+
+    function startEditCity(city) {
       editingCityId = city.id;
       nameInput.value = city.name;
       valueInput.value = city.value;
       positionInput.value = city.position;
       categorySelect.value = city.category;
       interestInput.value = city.interest;
+
       formTitle.textContent = "Edit Location";
       locationBtn.textContent = "Update Location";
       locationBtn.classList.remove("gray", "red");
       locationBtn.classList.add("blue");
     }
-function clearForm() {
+
+    function clearForm() {
       editingCityId = null;
       nameInput.value = "";
       valueInput.value = "";
@@ -493,7 +546,8 @@ function clearForm() {
       locationBtn.textContent = "Add Location";
       updateAddButtonState();
     }
-function validateForm() {
+
+    function validateForm() {
       if (
         !nameInput.value.trim() ||
         !valueInput.value.trim() ||
@@ -506,16 +560,19 @@ function validateForm() {
       }
       return true;
     }
-const defaultLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+    const defaultLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 20,
       attribution: '© OpenStreetMap contributors'
     });
+
     const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
       maxZoom: 20,
       attribution: '© Google Maps'
     });
-function generateSVGPin(colorHex) {
+
+    function generateSVGPin(colorHex) {
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
           <path fill="${colorHex}" d="M168 0C75.3 0 0 75.3 0 168C0 297 168 512 168 512C168 512 336 297 336 168C336 75.3 260.7 0 168 0zM168 240c-39.8 0-72-32.2-72-72 0-39.8 32.2-72 72-72 39.8 0 72 32.2 72 72C240 207.8 207.8 240 168 240z"/>
@@ -523,7 +580,8 @@ function generateSVGPin(colorHex) {
       `;
       return "data:image/svg+xml;base64," + btoa(svg);
     }
-function placeSelectedMarker(location) {
+
+    function placeSelectedMarker(location) {
       if (userSelectedMarker) {
         userSelectedMarker.setLatLng(location);
       } else {
@@ -545,7 +603,8 @@ function placeSelectedMarker(location) {
       positionInput.value = `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`;
       updateAddButtonState();
     }
-function startCyclingInterests() {
+
+    function startCyclingInterests() {
       if (allInterests.length === 0) return;
       interestDisplay.style.display = 'block';
       interestInterval = setInterval(() => {
@@ -553,34 +612,44 @@ function startCyclingInterests() {
         interestIndex = (interestIndex + 1) % allInterests.length;
       }, 1000);
     }
-function stopCyclingInterests() {
+
+    function stopCyclingInterests() {
       interestDisplay.style.display = 'none';
       clearInterval(interestInterval);
     }
-interestFilter.addEventListener('mouseenter', startCyclingInterests);
+
+    interestFilter.addEventListener('mouseenter', startCyclingInterests);
     interestFilter.addEventListener('mouseleave', stopCyclingInterests);
-function applyFilters() {
+
+    function applyFilters() {
       const activecitys = Array.from(document.querySelectorAll('.city-option:checked'))
         .map(cb => cb.value.toLowerCase());
+
       const categorySelected = document.getElementById('category-filter').value.toLowerCase();
       const locationInput = document.getElementById('location-filter').value.toLowerCase();
-      const interestInput = document.getElementById('interest-filter').value.toLowerCase();
+      const interestInputVal = document.getElementById('interest-filter').value.toLowerCase();
+
       citysMarkers.forEach(({ city, marker }) => {
         let isVisible = true;
+
         if (knownCityValues.includes(city.value.toLowerCase())) {
           if (!activecitys.includes(city.value.toLowerCase())) {
             isVisible = false;
           }
         }
+
         if (categorySelected && city.category.toLowerCase() !== categorySelected) {
           isVisible = false;
         }
+
         if (locationInput && !city.name.toLowerCase().includes(locationInput)) {
           isVisible = false;
         }
-        if (interestInput && !city.interest.toLowerCase().includes(interestInput)) {
+
+        if (interestInputVal && !city.interest.toLowerCase().includes(interestInputVal)) {
           isVisible = false;
         }
+
         if (isVisible) {
           marker.addTo(map);
         } else {
@@ -588,19 +657,23 @@ function applyFilters() {
         }
       });
     }
-function updateAddButtonState() {
+
+    function updateAddButtonState() {
       if (editingCityId) {
         locationBtn.textContent = "Update Location";
         locationBtn.classList.remove("gray", "red");
         locationBtn.classList.add("blue");
         return;
       }
+
       locationBtn.textContent = "Add Location";
+
       const nameFilled = !!nameInput.value.trim();
       const valueFilled = !!valueInput.value.trim();
       const posFilled = !!positionInput.value.trim();
       const catFilled = !!categorySelect.value.trim();
       const interestFilled = !!interestInput.value.trim();
+
       if (nameFilled && valueFilled && posFilled && catFilled && interestFilled) {
         locationBtn.classList.remove("gray", "blue");
         locationBtn.classList.add("red");
@@ -609,7 +682,8 @@ function updateAddButtonState() {
         locationBtn.classList.add("gray");
       }
     }
-window.onload = initLeafletMap;
+
+    window.onload = initLeafletMap;
   </script>
 </body>
 </html>
