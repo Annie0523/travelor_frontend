@@ -175,7 +175,7 @@ menu: nav/home.html
               <input type="checkbox" class="city-option" value="mexico_city" checked /> Mexico City
             </label>
             <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="sao_paulo" checked /> Sao Palo
+              <input type="checkbox" class="city-option" value="sao_paulo" checked /> Sao Paulo
             </label>
             <label class="city-checkbox">
               <input type="checkbox" class="city-option" value="buenos_aires" checked /> Buenos Aires
