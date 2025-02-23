@@ -27,7 +27,9 @@ menu: nav/home.html
       padding: 0;
       height: 100%;
       font-family: Arial, sans-serif;
+      background: #B3D9FF; /* lighter solid background color */
     }
+    /* Reverting to original flex layout */
     #container {
       display: flex;
       height: 100vh;
@@ -44,6 +46,7 @@ menu: nav/home.html
       overflow-y: auto;
       background-color: #f5f5f5;
       border-left: 1px solid #ccc;
+      border-radius: 0 0 10px 10px;
     }
     #filter-section {
       margin-bottom: 30px;
@@ -61,6 +64,8 @@ menu: nav/home.html
       width: 100%;
       margin-bottom: 10px;
       padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
     #info {
       border: 1px solid #ccc;
@@ -68,14 +73,7 @@ menu: nav/home.html
       background-color: #fff;
       margin-top: 20px;
     }
-    #selected-location {
-      margin-top: 10px;
-      font-weight: bold;
-      color: red;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      padding: 10px;
-    }
+    /* Removed the #selected-location box as requested */
     #location-btn {
       margin-top: 10px;
       padding: 8px;
@@ -83,6 +81,7 @@ menu: nav/home.html
       cursor: pointer;
       border: none;
       color: #fff;
+      border-radius: 4px;
     }
     .gray { background-color: #777; }
     .red { background-color: #d9534f; }
@@ -106,7 +105,7 @@ menu: nav/home.html
       display: inline-block;
     }
     .dropbtn {
-      background-color: #eee;
+      background-color: #D8BFD8; /* light purple for the Select Cities button */
       color: #333;
       padding: 8px 12px;
       font-size: 14px;
@@ -115,7 +114,7 @@ menu: nav/home.html
       border-radius: 4px;
     }
     .dropbtn:hover {
-      background-color: #ddd;
+      background-color: #ccc;
     }
     .dropdown-content {
       display: none;
@@ -139,6 +138,54 @@ menu: nav/home.html
       background-color: #fff;
       padding: 15px;
       border-radius: 6px;
+    }
+    /* Interest Tags control styling */
+    #interest-tags-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+    #interest-tags-container input {
+      flex: 1;
+      padding: 5px;
+    }
+    #add-interest-btn {
+      padding: 3px 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    #interest-count {
+      font-size: 12px;
+      color: #888;
+    }
+    /* Arrange arrow buttons in a row, smaller and closer */
+    #arrow-container {
+      display: flex;
+      gap: 2px;
+    }
+    .interest-arrow {
+      cursor: pointer;
+      padding: 3px;
+      font-size: 12px;
+    }
+    /* The current interest tag is now an editable input field */
+    #current-interest-tag {
+      margin-top: 5px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      display: none;
+      width: 100%;
+    }
+    /* Position container for latitude and longitude inputs */
+    #position-container {
+      display: flex;
+      gap: 4%;
+      margin-bottom: 10px;
+    }
+    #position-container input {
+      width: 48%;
     }
   </style>
 </head>
@@ -208,7 +255,7 @@ menu: nav/home.html
         <div class="filter-label">Interest Tags</div>
         <input type="text" id="interest-filter" placeholder="ex: Empire State, Anime" />
       </div>
-      <div id="selected-location">No location selected yet.</div>
+      <!-- Removed the selected-location box here -->
       <div id="filter-section">
         <div id="big-form">
           <h3 id="form-title">Add a New Location</h3>
@@ -216,8 +263,11 @@ menu: nav/home.html
           <input type="text" id="explore-name" placeholder="e.g. Chicago" />
           <label for="explore-value">Value:</label>
           <input type="text" id="explore-value" placeholder="e.g. chicago" />
-          <label for="explore-position">Position (lat, lng):</label>
-          <input type="text" id="explore-position" placeholder="e.g. 41.8781, -87.6298" />
+          <label>Position (lat, lng):</label>
+          <div id="position-container">
+            <input type="text" id="explore-lat" placeholder="Latitude" />
+            <input type="text" id="explore-lng" placeholder="Longitude" />
+          </div>
           <label for="explore-category">Category:</label>
           <select id="explore-category">
             <option value="">--Select Category--</option>
@@ -228,8 +278,18 @@ menu: nav/home.html
             <option value="Scenic">Scenic</option>
             <option value="Modern">Modern</option>
           </select>
-          <label for="explore-interest">Interest:</label>
-          <input type="text" id="explore-interest" placeholder="e.g. CHICAGO: deep-dish, windy city" />
+          <label for="explore-interest">Interest Tags:</label>
+          <div id="interest-tags-container">
+            <input type="text" id="explore-interest" placeholder="Enter an interest tag" />
+            <button type="button" id="add-interest-btn">+</button>
+            <span id="interest-count">0</span>
+            <div id="arrow-container">
+              <button type="button" class="interest-arrow" id="interest-up">▲</button>
+              <button type="button" class="interest-arrow" id="interest-down">▼</button>
+            </div>
+          </div>
+          <!-- Editable input for the current tag -->
+          <input type="text" id="current-interest-tag" placeholder="Current tag"/>
           <button id="location-btn" class="gray">Add Location</button>
         </div>
       </div>
@@ -242,55 +302,37 @@ menu: nav/home.html
   <script type="module">
     // Import the API configuration (URI and fetch options) from your config module.
     import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-
-    // Force-omit credentials to avoid "must be 'true'" CORS errors
-    // If fetchOptions includes credentials, remove or override them here.
     const safeFetchOptions = {
       ...fetchOptions,
       credentials: 'omit'
     };
-
-    // Also ensure we don't cause double slashes in URLs:
-    const baseURL = pythonURI.endsWith('/')
-      ? pythonURI.slice(0, -1)
-      : pythonURI;
-
-    const URL = baseURL; // final server base
-
+    const baseURL = pythonURI.endsWith('/') ? pythonURI.slice(0, -1) : pythonURI;
+    const URL = baseURL;
     let map;
     let citysMarkers = [];
     let userSelectedMarker = null;
     let editingCityId = null;
-
     const knownCityValues = [
       "tokyo", "mumbai", "cairo", "lagos", "london",
       "paris", "new_york_city", "mexico_city", "sao_paulo", "buenos_aires"
     ];
-
-    let allInterests = [];
-    let interestIndex = 0;
-    let interestInterval;
-
+    let interestTags = [];
+    let currentInterestIndex = 0;
     const interestFilter = document.getElementById('interest-filter');
     const interestDisplay = document.createElement('div');
     interestDisplay.style.display = 'none';
     interestDisplay.style.fontSize = '20px';
     interestDisplay.style.color = '#555';
     interestFilter.parentNode.appendChild(interestDisplay);
-
     const nameInput = document.getElementById('explore-name');
     const valueInput = document.getElementById('explore-value');
-    const positionInput = document.getElementById('explore-position');
+    const latInput = document.getElementById('explore-lat');
+    const lngInput = document.getElementById('explore-lng');
     const categorySelect = document.getElementById('explore-category');
-    const interestInput = document.getElementById('explore-interest');
     const locationBtn = document.getElementById('location-btn');
     const formTitle = document.getElementById('form-title');
-
     function initLeafletMap() {
-      map = L.map('map', {
-        layers: [defaultLayer]
-      }).setView([20, 0], 2);
-
+      map = L.map('map', { layers: [defaultLayer] }).setView([20, 0], 2);
       document.getElementById('satellite-toggle').addEventListener('click', () => {
         if (map.hasLayer(defaultLayer)) {
           map.removeLayer(defaultLayer);
@@ -300,14 +342,12 @@ menu: nav/home.html
           map.addLayer(defaultLayer);
         }
       });
-
       document.querySelectorAll('.city-option').forEach(checkbox => {
         checkbox.addEventListener('change', applyFilters);
       });
       document.getElementById('category-filter').addEventListener('change', applyFilters);
       document.getElementById('location-filter').addEventListener('input', applyFilters);
       document.getElementById('interest-filter').addEventListener('input', applyFilters);
-
       const cityDropdownBtn = document.getElementById('city-dropdown-btn');
       const cityDropdownContent = document.getElementById('city-dropdown-content');
       cityDropdownBtn.addEventListener('click', () => {
@@ -320,22 +360,63 @@ menu: nav/home.html
           }
         }
       });
-
       map.on("click", (e) => {
         placeSelectedMarker(e.latlng);
       });
-
       fetchDataFromBackend();
       fetchExploreInterests();
       locationBtn.addEventListener('click', submitLocation);
-
-      [nameInput, valueInput, positionInput, categorySelect, interestInput].forEach(elem => {
+      [nameInput, valueInput, categorySelect].forEach(elem => {
         elem.addEventListener('input', updateAddButtonState);
       });
+      nameInput.addEventListener('input', () => {
+        const sanitized = nameInput.value.toLowerCase().replace(/[^a-z]/g, '');
+        valueInput.value = sanitized;
+      });
+      valueInput.addEventListener('input', () => {
+        valueInput.value = valueInput.value.toLowerCase().replace(/[^a-z]/g, '');
+      });
+      document.getElementById('add-interest-btn').addEventListener('click', () => {
+        const interestInputField = document.getElementById('explore-interest');
+        const tag = interestInputField.value.trim();
+        if(tag !== ''){
+          interestTags.push(tag);
+          interestInputField.value = '';
+          const plusBtn = document.getElementById('add-interest-btn');
+          plusBtn.style.opacity = 0;
+          setTimeout(() => {
+            plusBtn.style.transition = 'opacity 1s';
+            plusBtn.style.opacity = 1;
+          }, 100);
+          document.getElementById('interest-count').innerText = interestTags.length;
+          if(interestTags.length > 0){
+            currentInterestIndex = interestTags.length - 1;
+            const currentDisplay = document.getElementById('current-interest-tag');
+            currentDisplay.style.display = 'block';
+            currentDisplay.value = interestTags[currentInterestIndex] || '';
+          }
+          updateAddButtonState();
+        }
+      });
+      document.getElementById('interest-up').addEventListener('click', () => {
+        if(interestTags.length > 0){
+          interestTags[currentInterestIndex] = document.getElementById('current-interest-tag').value;
+          currentInterestIndex = (currentInterestIndex + 1) % interestTags.length;
+          document.getElementById('current-interest-tag').value = interestTags[currentInterestIndex];
+        }
+      });
+      document.getElementById('interest-down').addEventListener('click', () => {
+        if(interestTags.length > 0){
+          interestTags[currentInterestIndex] = document.getElementById('current-interest-tag').value;
+          currentInterestIndex = (currentInterestIndex - 1 + interestTags.length) % interestTags.length;
+          document.getElementById('current-interest-tag').value = interestTags[currentInterestIndex];
+        }
+      });
+      document.getElementById('current-interest-tag').addEventListener('input', function(){
+          interestTags[currentInterestIndex] = this.value;
+      });
     }
-
     function fetchDataFromBackend() {
-      // Using safeFetchOptions with credentials omitted
       fetch(`${URL}/api/explores`, safeFetchOptions)
         .then(response => {
           if (!response.ok) {
@@ -346,17 +427,14 @@ menu: nav/home.html
         .then(data => {
           citysMarkers.forEach(({ marker }) => map.removeLayer(marker));
           citysMarkers = [];
-
           data.forEach(city => {
             const coords = city.position.split(',').map(str => parseFloat(str.trim()));
             const lat = coords[0];
             const lng = coords[1];
-
             let colorHex = "#0000FF";
             if (!knownCityValues.includes(city.value.toLowerCase())) {
               colorHex = "#00FF00";
             }
-
             const customIcon = L.icon({
               iconUrl: generateSVGPin(colorHex),
               iconSize: [25, 41],
@@ -364,7 +442,6 @@ menu: nav/home.html
               popupAnchor: [1, -34],
               shadowSize: [41, 41]
             });
-
             const marker = L.marker([lat, lng], { icon: customIcon });
             let popupHtml = `
               <b>${city.name}</b><br>
@@ -376,11 +453,12 @@ menu: nav/home.html
                 Update
               </button>
             `;
-
             marker.bindPopup(popupHtml);
             marker.addTo(map);
             marker.on('click', () => {
-              positionInput.value = city.position;
+              const pos = marker.getLatLng();
+              latInput.value = pos.lat.toFixed(4);
+              lngInput.value = pos.lng.toFixed(4);
             });
             marker.on('popupopen', (e) => {
               const popupNode = e.popup._contentNode;
@@ -403,7 +481,6 @@ menu: nav/home.html
         })
         .catch(error => console.error('Error fetching data:', error));
     }
-
     function fetchExploreInterests() {
       fetch(`${URL}/api/explores`, safeFetchOptions)
         .then(response => {
@@ -413,13 +490,12 @@ menu: nav/home.html
           return response.json();
         })
         .then(data => {
-          allInterests = data.flatMap(explore => {
+          const allInterests = data.flatMap(explore => {
             return explore.interest.split(',').map(tag => tag.trim());
           });
         })
         .catch(error => console.error('Error fetching interests:', error));
     }
-
     function submitLocation() {
       if (editingCityId) {
         updateLocation();
@@ -427,22 +503,18 @@ menu: nav/home.html
         addLocation();
       }
     }
-
     function addLocation() {
       if (!validateForm()) return;
-
       const requestBody = {
         name: nameInput.value.trim(),
         value: valueInput.value.trim(),
-        position: positionInput.value.trim(),
+        position: latInput.value.trim() + ', ' + lngInput.value.trim(),
         category: categorySelect.value.trim(),
-        interest: interestInput.value.trim()
+        interest: interestTags.join(', ')
       };
-
       fetch(`${URL}/api/explores`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // No need for credentials here
         body: JSON.stringify(requestBody)
       })
         .then(response => {
@@ -461,19 +533,16 @@ menu: nav/home.html
           alert('Failed to add the new location. Check console for details.');
         });
     }
-
     function updateLocation() {
       if (!validateForm()) return;
-
       const requestBody = {
         id: editingCityId,
         name: nameInput.value.trim(),
         value: valueInput.value.trim(),
-        position: positionInput.value.trim(),
+        position: latInput.value.trim() + ', ' + lngInput.value.trim(),
         category: categorySelect.value.trim(),
-        interest: interestInput.value.trim()
+        interest: interestTags.join(', ')
       };
-
       fetch(`${URL}/api/explores`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -496,10 +565,8 @@ menu: nav/home.html
           alert('Failed to update the location. Check console for details.');
         });
     }
-
     function doDeleteCity(cityId) {
       if (!confirm("Are you sure you want to delete this location?")) return;
-
       fetch(`${URL}/api/explores`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
@@ -520,58 +587,70 @@ menu: nav/home.html
           alert('Failed to delete the location. Check console for details.');
         });
     }
-
     function startEditCity(city) {
       editingCityId = city.id;
       nameInput.value = city.name;
       valueInput.value = city.value;
-      positionInput.value = city.position;
+      const coords = city.position.split(',');
+      if(coords.length === 2) {
+        latInput.value = coords[0].trim();
+        lngInput.value = coords[1].trim();
+      }
       categorySelect.value = city.category;
-      interestInput.value = city.interest;
-
+      interestTags = city.interest.split(',').map(tag => tag.trim()).filter(tag => tag);
+      currentInterestIndex = 0;
+      document.getElementById('interest-count').innerText = interestTags.length;
+      if(interestTags.length > 0){
+        document.getElementById('current-interest-tag').style.display = 'block';
+        document.getElementById('current-interest-tag').value = interestTags[currentInterestIndex];
+      } else {
+        document.getElementById('current-interest-tag').style.display = 'none';
+      }
       formTitle.textContent = "Edit Location";
       locationBtn.textContent = "Update Location";
       locationBtn.classList.remove("gray", "red");
       locationBtn.classList.add("blue");
     }
-
     function clearForm() {
       editingCityId = null;
       nameInput.value = "";
       valueInput.value = "";
-      positionInput.value = "";
+      latInput.value = "";
+      lngInput.value = "";
       categorySelect.value = "";
-      interestInput.value = "";
+      document.getElementById('explore-interest').value = "";
+      interestTags = [];
+      currentInterestIndex = 0;
+      document.getElementById('interest-count').innerText = "0";
+      document.getElementById('current-interest-tag').value = "";
+      document.getElementById('current-interest-tag').style.display = 'none';
       formTitle.textContent = "Add a New Location";
       locationBtn.textContent = "Add Location";
       updateAddButtonState();
     }
-
     function validateForm() {
       if (
         !nameInput.value.trim() ||
         !valueInput.value.trim() ||
-        !positionInput.value.trim() ||
+        !latInput.value.trim() ||
+        !lngInput.value.trim() ||
         !categorySelect.value.trim() ||
-        !interestInput.value.trim()
+        interestTags.length === 0
       ) {
-        alert("Please fill in all fields.");
+        alert("Please fill in all fields and add at least one interest tag.");
         return false;
       }
       return true;
     }
-
     const defaultLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 20,
       attribution: '© OpenStreetMap contributors'
     });
-
     const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
       maxZoom: 20,
       attribution: '© Google Maps'
     });
-
     function generateSVGPin(colorHex) {
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
@@ -580,7 +659,6 @@ menu: nav/home.html
       `;
       return "data:image/svg+xml;base64," + btoa(svg);
     }
-
     function placeSelectedMarker(location) {
       if (userSelectedMarker) {
         userSelectedMarker.setLatLng(location);
@@ -598,58 +676,32 @@ menu: nav/home.html
         }).addTo(map);
       }
       map.setView(location, map.getZoom());
-      document.getElementById("selected-location").innerText =
-        `Lat: ${location.lat.toFixed(4)}, Lng: ${location.lng.toFixed(4)}`;
-      positionInput.value = `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`;
+      latInput.value = location.lat.toFixed(4);
+      lngInput.value = location.lng.toFixed(4);
       updateAddButtonState();
     }
-
-    function startCyclingInterests() {
-      if (allInterests.length === 0) return;
-      interestDisplay.style.display = 'block';
-      interestInterval = setInterval(() => {
-        interestDisplay.innerText = allInterests[interestIndex];
-        interestIndex = (interestIndex + 1) % allInterests.length;
-      }, 1000);
-    }
-
-    function stopCyclingInterests() {
-      interestDisplay.style.display = 'none';
-      clearInterval(interestInterval);
-    }
-
-    interestFilter.addEventListener('mouseenter', startCyclingInterests);
-    interestFilter.addEventListener('mouseleave', stopCyclingInterests);
-
     function applyFilters() {
       const activecitys = Array.from(document.querySelectorAll('.city-option:checked'))
         .map(cb => cb.value.toLowerCase());
-
       const categorySelected = document.getElementById('category-filter').value.toLowerCase();
-      const locationInput = document.getElementById('location-filter').value.toLowerCase();
+      const locationInputVal = document.getElementById('location-filter').value.toLowerCase();
       const interestInputVal = document.getElementById('interest-filter').value.toLowerCase();
-
       citysMarkers.forEach(({ city, marker }) => {
         let isVisible = true;
-
         if (knownCityValues.includes(city.value.toLowerCase())) {
           if (!activecitys.includes(city.value.toLowerCase())) {
             isVisible = false;
           }
         }
-
         if (categorySelected && city.category.toLowerCase() !== categorySelected) {
           isVisible = false;
         }
-
-        if (locationInput && !city.name.toLowerCase().includes(locationInput)) {
+        if (locationInputVal && !city.name.toLowerCase().includes(locationInputVal)) {
           isVisible = false;
         }
-
         if (interestInputVal && !city.interest.toLowerCase().includes(interestInputVal)) {
           isVisible = false;
         }
-
         if (isVisible) {
           marker.addTo(map);
         } else {
@@ -657,32 +709,33 @@ menu: nav/home.html
         }
       });
     }
-
     function updateAddButtonState() {
       if (editingCityId) {
         locationBtn.textContent = "Update Location";
         locationBtn.classList.remove("gray", "red");
         locationBtn.classList.add("blue");
-        return;
+      } else {
+        locationBtn.textContent = "Add Location";
       }
-
-      locationBtn.textContent = "Add Location";
-
       const nameFilled = !!nameInput.value.trim();
       const valueFilled = !!valueInput.value.trim();
-      const posFilled = !!positionInput.value.trim();
+      const posFilled = !!latInput.value.trim() && !!lngInput.value.trim();
       const catFilled = !!categorySelect.value.trim();
-      const interestFilled = !!interestInput.value.trim();
-
+      const interestFilled = interestTags.length > 0;
       if (nameFilled && valueFilled && posFilled && catFilled && interestFilled) {
         locationBtn.classList.remove("gray", "blue");
         locationBtn.classList.add("red");
+        document.querySelectorAll('#big-form input, #big-form select').forEach(el => {
+          el.style.boxShadow = '0 0 5px 2px lightblue';
+        });
       } else {
         locationBtn.classList.remove("red", "blue");
         locationBtn.classList.add("gray");
+        document.querySelectorAll('#big-form input, #big-form select').forEach(el => {
+          el.style.boxShadow = '';
+        });
       }
     }
-
     window.onload = initLeafletMap;
   </script>
 </body>
