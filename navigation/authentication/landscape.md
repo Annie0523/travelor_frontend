@@ -61,6 +61,7 @@ search_exclude: true
                 <th>Country</th>
                 <th>City</th>
                 <th>Description</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody id="result">
@@ -70,11 +71,12 @@ search_exclude: true
 </div>
 
 <script type="module">
-    import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import {pythonURI, fetchOptions} from '{{site.baseurl}}/assets/js/api/config.js';
+    const URL = pythonURI;
 
     window.fetchLandscapes = async function() {
         try {
-            const response = await fetch(`${pythonURI}/api/landscapes`, fetchOptions);
+            const response = await fetch(`${URL}/api/landscapes`, fetchOptions);
             if (!response.ok) {
                 throw new Error('Failed to fetch landscapes: ' + response.statusText);
             }
@@ -87,7 +89,7 @@ search_exclude: true
         }
     }
 
-    function displayLandscapes(landscapeData) {
+    window.displayLandscapes = function(landscapeData) {
         const resultContainer = document.getElementById('result');
         resultContainer.innerHTML = ''; // Clear previous content
 
@@ -102,16 +104,87 @@ search_exclude: true
             const country = document.createElement('td');
             const city = document.createElement('td');
             const description = document.createElement('td');
+            const actions = document.createElement('td');
+
             name.innerHTML = landscape.name || 'N/A'; 
             country.innerHTML = landscape.country || 'N/A'; 
             city.innerHTML = landscape.city || 'N/A'; 
             description.innerHTML = landscape.description || 'N/A'; 
+
+            actions.innerHTML = `
+                <button onclick="editLandscape('${landscape.id}', '${landscape.name}', '${landscape.country}', '${landscape.city}', '${landscape.description}')">Update</button>
+                <button onclick="deleteLandscape('${landscape.id}')">Delete</button>
+            `;
+
             tr.appendChild(name);
             tr.appendChild(country);
             tr.appendChild(city);
             tr.appendChild(description);
+            tr.appendChild(actions);
             resultContainer.appendChild(tr);
         });
+    }
+
+    window.deleteLandscape = async function(id) {
+        try {
+            const response = await fetch(`${URL}/api/landscapes`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: id })
+            });
+
+            if (response.ok) {
+                alert('Landscape deleted successfully!');
+                window.fetchLandscapes(); // Refresh the table
+            } else {
+                alert('Failed to delete landscape.');
+            }
+        } catch (error) {
+            console.error('Error deleting landscape:', error);
+            alert('An error occurred while deleting the landscape.');
+        }
+    }
+
+    window.updateLandscape = async function(id, name, country, city, description) {
+        try {
+            const response = await fetch(`${URL}/api/landscapes`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: id,
+                    name: name,
+                    country: country,
+                    city: city,
+                    description: description
+                })
+            });
+
+            if (response.ok) {
+                alert('Landscape updated successfully!');
+                window.fetchLandscapes(); // Refresh the table
+            } else {
+                alert('Failed to update landscape.');
+            }
+        } catch (error) {
+            console.error('Error updating landscape:', error);
+            alert('An error occurred while updating the landscape.');
+        }
+    }
+
+    window.editLandscape = function(id, name, country, city, description) {
+        document.getElementById('name').value = name;
+        document.getElementById('country').value = country;
+        document.getElementById('city').value = city;
+        document.getElementById('description').value = description;
+
+        document.getElementById('landscapeForm').onsubmit = async function(event) {
+            event.preventDefault();
+            await updateLandscape(id, document.getElementById('name').value, document.getElementById('country').value, document.getElementById('city').value, document.getElementById('description').value);
+        };
     }
 
     // Fetch and display landscapes when the page loads
@@ -128,7 +201,7 @@ search_exclude: true
         };
 
         try {
-            const response = await fetch(`${pythonURI}/api/landscapes`, {
+            const response = await fetch(`${URL}/api/landscapes`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
