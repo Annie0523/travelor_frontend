@@ -71,7 +71,7 @@ search_exclude: true
 </div>
 
 <script type="module">
-    import {pythonURI, fetchOptions} from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     const URL = pythonURI;
 
     window.fetchLandscapes = async function() {
@@ -132,7 +132,8 @@ search_exclude: true
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ id: id })
+                body: JSON.stringify({ id: id }),
+                ...fetchOptions
             });
 
             if (response.ok) {
@@ -160,7 +161,8 @@ search_exclude: true
                     country: country,
                     city: city,
                     description: description
-                })
+                }),
+                ...fetchOptions
             });
 
             if (response.ok) {
@@ -206,7 +208,8 @@ search_exclude: true
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(formData),
+                ...fetchOptions
             });
 
             if (response.ok) {
