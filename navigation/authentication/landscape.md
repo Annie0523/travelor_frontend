@@ -133,7 +133,6 @@ search_exclude: true
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ id: id }),
-                ...fetchOptions
             });
 
             if (response.ok) {
@@ -162,7 +161,6 @@ search_exclude: true
                     city: city,
                     description: description
                 }),
-                ...fetchOptions
             });
 
             if (response.ok) {
@@ -209,7 +207,6 @@ search_exclude: true
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(formData),
-                ...fetchOptions
             });
 
             if (response.ok) {
