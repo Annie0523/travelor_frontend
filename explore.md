@@ -1,13 +1,3 @@
----
-layout: post
-title: Explore
-search_exclude: true
-description: A map with some popular cities
-hide: true
-permalink: /explore
-menu: nav/home.html
----
-
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -332,7 +322,10 @@ menu: nav/home.html
     const locationBtn = document.getElementById('location-btn');
     const formTitle = document.getElementById('form-title');
     function initLeafletMap() {
-      map = L.map('map', { layers: [defaultLayer] }).setView([20, 0], 2);
+      // Define the world bounds using the provided coordinates.
+      // Southwest bound: (-85.0219, -172.9874), Northeast bound: (84.6709, 205.2936)
+      const worldBounds = L.latLngBounds([ -85.0219, -172.9874 ], [84.6709, 205.2936 ]);
+      map = L.map('map', { layers: [defaultLayer], maxBounds: worldBounds, maxBoundsViscosity: 1.0 }).setView([20, 0], 2);
       document.getElementById('satellite-toggle').addEventListener('click', () => {
         if (map.hasLayer(defaultLayer)) {
           map.removeLayer(defaultLayer);
