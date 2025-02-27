@@ -1,3 +1,13 @@
+---
+layout: post
+title: Explore
+search_exclude: true
+description: A map with some popular cities
+hide: true
+permalink: /explore
+menu: nav/home.html
+---
+
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -6,9 +16,8 @@
   <!-- Leaflet core stylesheet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-  <!-- Keep preload but remove explicit crossorigin to avoid credential-mode mismatch -->
+  <!-- Preload Google Fonts -->
   <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style">
-  <!-- Likewise remove crossorigin from the actual stylesheet link -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap">
 
   <style>
@@ -16,10 +25,9 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      font-family: Arial, sans-serif;
-      background: #B3D9FF; /* lighter solid background color */
+      font-family: 'Open Sans', Arial, sans-serif;
+      background: #B3D9FF;
     }
-    /* Reverting to original flex layout */
     #container {
       display: flex;
       height: 100vh;
@@ -63,7 +71,6 @@
       background-color: #fff;
       margin-top: 20px;
     }
-    /* Removed the #selected-location box as requested */
     #location-btn {
       margin-top: 10px;
       padding: 8px;
@@ -95,7 +102,7 @@
       display: inline-block;
     }
     .dropbtn {
-      background-color: #D8BFD8; /* light purple for the Select Cities button */
+      background-color: #D8BFD8;
       color: #333;
       padding: 8px 12px;
       font-size: 14px;
@@ -144,12 +151,12 @@
       padding: 3px 6px;
       font-size: 12px;
       cursor: pointer;
+      transition: box-shadow 0.3s ease;
     }
     #interest-count {
       font-size: 12px;
       color: #888;
     }
-    /* Arrange arrow buttons in a row, smaller and closer */
     #arrow-container {
       display: flex;
       gap: 2px;
@@ -159,7 +166,6 @@
       padding: 3px;
       font-size: 12px;
     }
-    /* The current interest tag is now an editable input field */
     #current-interest-tag {
       margin-top: 5px;
       padding: 5px;
@@ -168,7 +174,6 @@
       display: none;
       width: 100%;
     }
-    /* Position container for latitude and longitude inputs */
     #position-container {
       display: flex;
       gap: 4%;
@@ -176,6 +181,53 @@
     }
     #position-container input {
       width: 48%;
+    }
+    /* Modal styling for error and success messages */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background-color: #fff;
+      padding: 20px 30px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      max-width: 400px;
+      width: 80%;
+    }
+    .modal-content p {
+      font-size: 18px;
+      color: #333;
+      margin: 0 0 20px;
+    }
+    .modal-button {
+      background-color: #0275d8;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .modal-button:hover {
+      background-color: #025aa5;
+    }
+    /* Success modal button override */
+    .modal-success .modal-button {
+      background-color: #5cb85c;
+    }
+    .modal-success .modal-button:hover {
+      background-color: #4cae4c;
     }
   </style>
 </head>
@@ -192,36 +244,7 @@
         <div class="dropdown">
           <button class="dropbtn" id="city-dropdown-btn">Select Cities</button>
           <div class="dropdown-content" id="city-dropdown-content">
-            <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="tokyo" checked /> Tokyo
-            </label>
-            <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="mumbai" checked /> Mumbai
-            </label>
-            <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="cairo" checked /> Cairo
-            </label>
-            <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="lagos" checked /> Lagos
-            </label>
-            <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="london" checked /> London
-            </label>
-            <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="paris" checked /> Paris
-            </label>
-            <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="new_york_city" checked /> New York City
-            </label>
-            <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="mexico_city" checked /> Mexico City
-            </label>
-            <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="sao_paulo" checked /> Sao Paulo
-            </label>
-            <label class="city-checkbox">
-              <input type="checkbox" class="city-option" value="buenos_aires" checked /> Buenos Aires
-            </label>
+            <!-- This will be populated dynamically -->
           </div>
         </div>
       </div>
@@ -245,7 +268,6 @@
         <div class="filter-label">Interest Tags</div>
         <input type="text" id="interest-filter" placeholder="ex: Empire State, Anime" />
       </div>
-      <!-- Removed the selected-location box here -->
       <div id="filter-section">
         <div id="big-form">
           <h3 id="form-title">Add a New Location</h3>
@@ -278,7 +300,6 @@
               <button type="button" class="interest-arrow" id="interest-down">▼</button>
             </div>
           </div>
-          <!-- Editable input for the current tag -->
           <input type="text" id="current-interest-tag" placeholder="Current tag"/>
           <button id="location-btn" class="gray">Add Location</button>
         </div>
@@ -286,34 +307,36 @@
     </div>
   </div>
 
+  <!-- Modal for error and success messages -->
+  <div id="message-modal" class="modal">
+    <div class="modal-content">
+      <p id="modal-message"></p>
+      <button id="modal-ok-btn" class="modal-button">OK</button>
+    </div>
+  </div>
+
   <!-- Leaflet core library -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script type="module">
-    // Import the API configuration (URI and fetch options) from your config module.
     import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    const safeFetchOptions = {
-      ...fetchOptions,
-      credentials: 'omit'
-    };
+    const safeFetchOptions = { ...fetchOptions, credentials: 'omit' };
     const baseURL = pythonURI.endsWith('/') ? pythonURI.slice(0, -1) : pythonURI;
     const URL = baseURL;
     let map;
     let citysMarkers = [];
     let userSelectedMarker = null;
     let editingCityId = null;
-    const knownCityValues = [
-      "tokyo", "mumbai", "cairo", "lagos", "london",
-      "paris", "new_york_city", "mexico_city", "sao_paulo", "buenos_aires"
-    ];
     let interestTags = [];
     let currentInterestIndex = 0;
+    
     const interestFilter = document.getElementById('interest-filter');
     const interestDisplay = document.createElement('div');
     interestDisplay.style.display = 'none';
     interestDisplay.style.fontSize = '20px';
     interestDisplay.style.color = '#555';
     interestFilter.parentNode.appendChild(interestDisplay);
+    
     const nameInput = document.getElementById('explore-name');
     const valueInput = document.getElementById('explore-value');
     const latInput = document.getElementById('explore-lat');
@@ -321,11 +344,43 @@
     const categorySelect = document.getElementById('explore-category');
     const locationBtn = document.getElementById('location-btn');
     const formTitle = document.getElementById('form-title');
+    
+    // Modal dialog functions
+    const messageModal = document.getElementById('message-modal');
+    const modalMessage = document.getElementById('modal-message');
+    const modalOkBtn = document.getElementById('modal-ok-btn');
+    // Remove any modal type classes when OK is clicked.
+    modalOkBtn.addEventListener('click', () => {
+      messageModal.style.display = 'none';
+      messageModal.classList.remove('modal-error', 'modal-success');
+    });
+    function showModal(message, type) {
+      modalMessage.textContent = message;
+      // Set the OK button color based on message type.
+      if(type === 'success'){
+        messageModal.classList.add('modal-success');
+      } else {
+        messageModal.classList.remove('modal-success');
+      }
+      messageModal.style.display = 'flex';
+    }
+    function showErrorModal(message) {
+      showModal(message, 'error');
+    }
+    function showSuccessModal(message) {
+      showModal(message, 'success');
+    }
+    
     function initLeafletMap() {
-      // Define the world bounds using the provided coordinates.
-      // Southwest bound: (-85.0219, -172.9874), Northeast bound: (84.6709, 205.2936)
       const worldBounds = L.latLngBounds([ -85.0219, -172.9874 ], [84.6709, 205.2936 ]);
-      map = L.map('map', { layers: [defaultLayer], maxBounds: worldBounds, maxBoundsViscosity: 1.0 }).setView([20, 0], 2);
+      map = L.map('map', { 
+        layers: [defaultLayer], 
+        maxBounds: worldBounds, 
+        maxBoundsViscosity: 1.0,
+        minZoom: 2, 
+        maxZoom: 20 
+      }).setView([20, 0], 2);
+      
       document.getElementById('satellite-toggle').addEventListener('click', () => {
         if (map.hasLayer(defaultLayer)) {
           map.removeLayer(defaultLayer);
@@ -335,12 +390,11 @@
           map.addLayer(defaultLayer);
         }
       });
-      document.querySelectorAll('.city-option').forEach(checkbox => {
-        checkbox.addEventListener('change', applyFilters);
-      });
+      
       document.getElementById('category-filter').addEventListener('change', applyFilters);
       document.getElementById('location-filter').addEventListener('input', applyFilters);
       document.getElementById('interest-filter').addEventListener('input', applyFilters);
+      
       const cityDropdownBtn = document.getElementById('city-dropdown-btn');
       const cityDropdownContent = document.getElementById('city-dropdown-content');
       cityDropdownBtn.addEventListener('click', () => {
@@ -348,11 +402,10 @@
       });
       window.addEventListener('click', function(e) {
         if (!e.target.matches('#city-dropdown-btn')) {
-          if (cityDropdownContent.classList.contains('show')) {
-            cityDropdownContent.classList.remove('show');
-          }
+          cityDropdownContent.classList.remove('show');
         }
       });
+      
       map.on("click", (e) => {
         placeSelectedMarker(e.latlng);
       });
@@ -369,13 +422,25 @@
       valueInput.addEventListener('input', () => {
         valueInput.value = valueInput.value.toLowerCase().replace(/[^a-z]/g, '');
       });
+      
+      // Glow plus button red when interest input is not empty.
+      document.getElementById('explore-interest').addEventListener('input', function(){
+        const plusBtn = document.getElementById('add-interest-btn');
+        if(this.value.trim() !== ''){
+          plusBtn.style.boxShadow = '0 0 10px 2px red';
+        } else {
+          plusBtn.style.boxShadow = '';
+        }
+      });
+      
       document.getElementById('add-interest-btn').addEventListener('click', () => {
         const interestInputField = document.getElementById('explore-interest');
         const tag = interestInputField.value.trim();
         if(tag !== ''){
+          const plusBtn = document.getElementById('add-interest-btn');
+          plusBtn.style.boxShadow = '';
           interestTags.push(tag);
           interestInputField.value = '';
-          const plusBtn = document.getElementById('add-interest-btn');
           plusBtn.style.opacity = 0;
           setTimeout(() => {
             plusBtn.style.transition = 'opacity 1s';
@@ -391,6 +456,7 @@
           updateAddButtonState();
         }
       });
+      
       document.getElementById('interest-up').addEventListener('click', () => {
         if(interestTags.length > 0){
           interestTags[currentInterestIndex] = document.getElementById('current-interest-tag').value;
@@ -409,6 +475,7 @@
           interestTags[currentInterestIndex] = this.value;
       });
     }
+    
     function fetchDataFromBackend() {
       fetch(`${URL}/api/explores`, safeFetchOptions)
         .then(response => {
@@ -425,7 +492,7 @@
             const lat = coords[0];
             const lng = coords[1];
             let colorHex = "#0000FF";
-            if (!knownCityValues.includes(city.value.toLowerCase())) {
+            if(city.value.toLowerCase().indexOf('_') === -1){
               colorHex = "#00FF00";
             }
             const customIcon = L.icon({
@@ -470,10 +537,39 @@
             });
             citysMarkers.push({ city, marker });
           });
+          updateCityDropdown(data);
           applyFilters();
         })
-        .catch(error => console.error('Error fetching data:', error));
+        .catch(error => {
+          console.error('Error fetching data:', error);
+          showErrorModal('Error fetching data from /api/explores. Check console for details.');
+        });
     }
+    
+    // Update the cities dropdown to sort entries alphabetically by name.
+    function updateCityDropdown(data) {
+      const dropdown = document.getElementById('city-dropdown-content');
+      dropdown.innerHTML = '';
+      const uniqueCities = new Map();
+      data.forEach(city => {
+        uniqueCities.set(city.value.toLowerCase(), city.name);
+      });
+      const sortedCities = Array.from(uniqueCities.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+      sortedCities.forEach(([value, name]) => {
+        const label = document.createElement('label');
+        label.className = 'city-checkbox';
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.className = 'city-option';
+        input.value = value;
+        input.checked = true;
+        input.addEventListener('change', applyFilters);
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(' ' + name));
+        dropdown.appendChild(label);
+      });
+    }
+    
     function fetchExploreInterests() {
       fetch(`${URL}/api/explores`, safeFetchOptions)
         .then(response => {
@@ -483,12 +579,14 @@
           return response.json();
         })
         .then(data => {
-          const allInterests = data.flatMap(explore => {
-            return explore.interest.split(',').map(tag => tag.trim());
-          });
+          // Additional interest logic can be added here if needed.
         })
-        .catch(error => console.error('Error fetching interests:', error));
+        .catch(error => {
+          console.error('Error fetching interests:', error);
+          showErrorModal('Error fetching interests from /api/explores. Check console for details.');
+        });
     }
+    
     function submitLocation() {
       if (editingCityId) {
         updateLocation();
@@ -496,6 +594,7 @@
         addLocation();
       }
     }
+    
     function addLocation() {
       if (!validateForm()) return;
       const requestBody = {
@@ -517,15 +616,16 @@
           return response.json();
         })
         .then(data => {
-          alert(`New location '${data.name}' added successfully!`);
+          showSuccessModal(`New location '${data.name}' added successfully!`);
           fetchDataFromBackend();
           clearForm();
         })
         .catch(error => {
           console.error('Error adding new explore:', error);
-          alert('Failed to add the new location. Check console for details.');
+          showErrorModal('Failed to add the new location. Check console for details.');
         });
     }
+    
     function updateLocation() {
       if (!validateForm()) return;
       const requestBody = {
@@ -548,16 +648,17 @@
           return response.json();
         })
         .then(result => {
-          alert("Thank you for updating the location!");
+          showSuccessModal("Thank you for updating the location!");
           editingCityId = null;
           fetchDataFromBackend();
           clearForm();
         })
         .catch(error => {
           console.error('Error updating location:', error);
-          alert('Failed to update the location. Check console for details.');
+          showErrorModal('Failed to update the location. Check console for details.');
         });
     }
+    
     function doDeleteCity(cityId) {
       if (!confirm("Are you sure you want to delete this location?")) return;
       fetch(`${URL}/api/explores`, {
@@ -572,14 +673,15 @@
           return response.json();
         })
         .then(result => {
-          alert(result.message || result);
+          showSuccessModal(result.message || result);
           fetchDataFromBackend();
         })
         .catch(error => {
           console.error('Error deleting:', error);
-          alert('Failed to delete the location. Check console for details.');
+          showErrorModal('Failed to delete the location. Check console for details.');
         });
     }
+    
     function startEditCity(city) {
       editingCityId = city.id;
       nameInput.value = city.name;
@@ -604,6 +706,7 @@
       locationBtn.classList.remove("gray", "red");
       locationBtn.classList.add("blue");
     }
+    
     function clearForm() {
       editingCityId = null;
       nameInput.value = "";
@@ -621,6 +724,8 @@
       locationBtn.textContent = "Add Location";
       updateAddButtonState();
     }
+    
+    // Updated validateForm to use the modal dialog for error messages.
     function validateForm() {
       if (
         !nameInput.value.trim() ||
@@ -630,11 +735,16 @@
         !categorySelect.value.trim() ||
         interestTags.length === 0
       ) {
-        alert("Please fill in all fields and add at least one interest tag.");
+        let errorMsg = "Please fill in all fields and add at least one interest tag.";
+        if(interestTags.length === 0) {
+          errorMsg += " Don't forget to click the plus to add the tag.";
+        }
+        showErrorModal(errorMsg);
         return false;
       }
       return true;
     }
+    
     const defaultLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 20,
       attribution: '© OpenStreetMap contributors'
@@ -644,6 +754,7 @@
       maxZoom: 20,
       attribution: '© Google Maps'
     });
+    
     function generateSVGPin(colorHex) {
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
@@ -652,6 +763,7 @@
       `;
       return "data:image/svg+xml;base64," + btoa(svg);
     }
+    
     function placeSelectedMarker(location) {
       if (userSelectedMarker) {
         userSelectedMarker.setLatLng(location);
@@ -673,6 +785,7 @@
       lngInput.value = location.lng.toFixed(4);
       updateAddButtonState();
     }
+    
     function applyFilters() {
       const activecitys = Array.from(document.querySelectorAll('.city-option:checked'))
         .map(cb => cb.value.toLowerCase());
@@ -681,10 +794,8 @@
       const interestInputVal = document.getElementById('interest-filter').value.toLowerCase();
       citysMarkers.forEach(({ city, marker }) => {
         let isVisible = true;
-        if (knownCityValues.includes(city.value.toLowerCase())) {
-          if (!activecitys.includes(city.value.toLowerCase())) {
-            isVisible = false;
-          }
+        if (activecitys.length > 0 && !activecitys.includes(city.value.toLowerCase())) {
+          isVisible = false;
         }
         if (categorySelected && city.category.toLowerCase() !== categorySelected) {
           isVisible = false;
@@ -702,6 +813,7 @@
         }
       });
     }
+    
     function updateAddButtonState() {
       if (editingCityId) {
         locationBtn.textContent = "Update Location";
@@ -729,6 +841,7 @@
         });
       }
     }
+    
     window.onload = initLeafletMap;
   </script>
 </body>
