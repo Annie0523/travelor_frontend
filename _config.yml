@@ -16,7 +16,7 @@ plugins:
 header_pages:
   - navigation/ai.md
   - navigation/authentication/post.md
-  - navigation/authentication/developer.md
+  - navigation/authentication/landscape.md
   - navigation/authentication/weather.md
   
 # GitHub Metadata
