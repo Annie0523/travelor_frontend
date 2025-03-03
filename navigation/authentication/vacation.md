@@ -11,7 +11,7 @@ search_exclude: true
         font-family: 'Comic Sans MS', cursive, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #ffe4e1; /* Light pinkish background for a cute vibe */
+        background: linear-gradient(to right, #ff9a9e, #fad0c4); /* Soft gradient for a dreamy vibe */
         color: #333;
     }
 
@@ -22,27 +22,27 @@ search_exclude: true
     }
 
     .earth-icon {
-        width: 50px;
-        height: 50px;
-        background-color: #4CAF50; /* Green like the Earth */
+        width: 60px;
+        height: 60px;
+        background: radial-gradient(circle, #4CAF50, #2E8B57);
         border-radius: 50%;
-        margin: 0 auto 20px auto;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 24px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        font-size: 28px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        margin: 0 auto 20px;
     }
 
     .earth-icon::before {
-        content: "🌍"; /* Earth emoji for a cute touch */
+        content: "🌍";
     }
 
     h1 {
         text-align: center;
-        margin-bottom: 20px;
         color: #4CAF50;
+        text-shadow: 2px 2px 10px rgba(76, 175, 80, 0.5);
     }
 
     .vacation-grid {
@@ -52,9 +52,9 @@ search_exclude: true
     }
 
     .vacation-card {
-        background-color: #fff;
+        background: white;
         border-radius: 15px;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         overflow: hidden;
         transition: transform 0.3s, box-shadow 0.3s;
         padding: 15px;
@@ -63,13 +63,13 @@ search_exclude: true
 
     .vacation-card:hover {
         transform: scale(1.05);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }
 
     .vacation-card h2 {
         margin: 10px 0;
         padding: 10px;
-        background-color: #87CEFA; /* Soft blue background */
+        background: #ffb6c1;
         color: white;
         border-radius: 10px;
     }
@@ -83,9 +83,9 @@ search_exclude: true
     .form-container {
         margin-top: 40px;
         padding: 20px;
-        background-color: #fff;
+        background: white;
         border-radius: 15px;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
 
     form {
@@ -108,7 +108,7 @@ search_exclude: true
     }
 
     button {
-        background-color: #FF69B4; /* Hot pink for a playful vibe */
+        background: linear-gradient(to right, #ff69b4, #ff1493);
         color: white;
         border: none;
         cursor: pointer;
@@ -117,17 +117,14 @@ search_exclude: true
     }
 
     button:hover {
-        background-color: #FF1493; /* Darker pink for hover */
+        background: linear-gradient(to right, #ff1493, #c71585);
     }
 </style>
 
 <div class="container">
     <div class="earth-icon"></div>
     <h1>Explore Our Recommended Vacation Spots!</h1>
-    <div class="vacation-grid" id="vacationGrid">
-        <!-- JavaScript generated vacation cards -->
-    </div>
-
+    <div class="vacation-grid" id="vacationGrid"></div>
     <div class="form-container">
         <h2>Add a New Vacation Spot</h2>
         <form id="vacationForm">
@@ -143,11 +140,11 @@ search_exclude: true
 </div>
 
 <script type="module">
-    import {pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js'
+    import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     const URL = pythonURI;
     async function fetchVacations() {
         try {
-            const response = await fetch(`${URL}/api/vacations`, fetchOptions)
+            const response = await fetch(`${URL}/api/vacations`, fetchOptions);
             if (!response.ok) {
                 throw new Error('Failed to fetch vacations: ' + response.statusText);
             }
@@ -157,6 +154,7 @@ search_exclude: true
             console.error('Error fetching vacations:', error);
         }
     }
+
     function displayVacations(vacations) {
         const vacationGrid = document.getElementById('vacationGrid');
         vacationGrid.innerHTML = '';
@@ -171,6 +169,7 @@ search_exclude: true
             vacationGrid.appendChild(card);
         });
     }
+
     document.getElementById('vacationForm').addEventListener('submit', async function(event) {
         event.preventDefault();
         const name = document.getElementById('name').value;
@@ -179,9 +178,7 @@ search_exclude: true
         try {
             const response = await fetch(`${URL}/api/vacations`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, climate, country })
             });
             if (!response.ok) {
@@ -197,5 +194,3 @@ search_exclude: true
     });
     fetchVacations();
 </script>
-
-
