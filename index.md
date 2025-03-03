@@ -9,16 +9,16 @@ menu: nav/home.html
 
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Travelers</title>
 
-  <!-- Instead of <link rel="preload"> for the font, we do preconnect + normal stylesheet -->
+  <!-- Instead of preload, do preconnect + normal stylesheet to avoid font warnings -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:400,700&display=swap">
 
-  <!-- Three.js for the Interactive Sphere -->
+  <!-- Three.js for Interactive Globe -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
@@ -265,7 +265,7 @@ menu: nav/home.html
       border-radius: 15px;
     }
     
-    /* "Explore Vacations" Button */
+    /* Explore Vacations Button */
     button.explore-vacations {
       margin: 30px 50px;
       background-color: #26a69a;
@@ -357,7 +357,7 @@ menu: nav/home.html
       font-size: 1.5rem;
     }
     
-    /* Newsletter Modal */
+    /* Newsletter Signup Modal */
     #newsletterModal {
       display: none;
       position: fixed;
@@ -538,7 +538,7 @@ menu: nav/home.html
     </div>
   </section>
   
-  <!-- Featured Destinations -->
+  <!-- Featured Destinations Cards -->
   <section>
     <h2 class="section-title">Featured Destinations</h2>
     <div class="card-container">
@@ -643,7 +643,7 @@ menu: nav/home.html
       <button id="chatbot-send" onclick="sendChatbotMessage()">Send</button>
     </div>
   </div>
-  
+
   <!-- EXACT "Leave a Comment" Feature -->
   <section class="comment-section" style="text-align:center; margin-top:40px;">
     <button onclick="openCommentModal()">Leave a Comment</button>
@@ -677,40 +677,40 @@ menu: nav/home.html
     }
     window.toggleMobileNav = toggleMobileNav;
     
-    /* --- Interactive Globe Setup --- */
+    /* --- Interactive Travel Sphere with Embedded Navigation Markers --- */
     let sphereScene, sphereCamera, sphereRenderer, sphereMesh;
     const markers = [];
     
-    function createTextSprite(msg, params = {}) {
-      const fontface = params.fontface || "Arial";
-      const fontsize = params.fontsize || 32;
-      const borderThickness = params.borderThickness || 4;
-      const borderColor = params.borderColor || { r:0, g:0, b:0, a:1.0 };
-      const bgColor = params.backgroundColor || { r:255, g:255, b:255, a:1.0 };
+    function createTextSprite(message, parameters = {}) {
+      const fontface = parameters.fontface || "Arial";
+      const fontsize = parameters.fontsize || 32;
+      const borderThickness = parameters.borderThickness || 4;
+      const borderColor = parameters.borderColor || { r:0, g:0, b:0, a:1.0 };
+      const bgColor = parameters.backgroundColor || { r:255, g:255, b:255, a:1.0 };
       
       const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      ctx.font = fontsize + "px " + fontface;
-      const metrics = ctx.measureText(msg);
+      const context = canvas.getContext('2d');
+      context.font = fontsize + "px " + fontface;
+      const metrics = context.measureText(message);
       const textWidth = metrics.width;
-      canvas.width = textWidth + borderThickness*4;
-      canvas.height = fontsize*1.8 + borderThickness*4;
+      canvas.width = textWidth + borderThickness * 4;
+      canvas.height = fontsize * 1.8 + borderThickness * 4;
       
       // Draw an oval shape
-      ctx.beginPath();
-      ctx.ellipse(canvas.width/2, canvas.height/2, canvas.width/2, canvas.height/2, 0, 0, 2*Math.PI);
-      ctx.fillStyle = `rgba(${bgColor.r},${bgColor.g},${bgColor.b},${bgColor.a})`;
-      ctx.fill();
-      ctx.lineWidth = borderThickness;
-      ctx.strokeStyle = `rgba(${borderColor.r},${borderColor.g},${borderColor.b},${borderColor.a})`;
-      ctx.stroke();
+      context.beginPath();
+      context.ellipse(canvas.width/2, canvas.height/2, canvas.width/2, canvas.height/2, 0, 0, 2 * Math.PI);
+      context.fillStyle = `rgba(${bgColor.r},${bgColor.g},${bgColor.b},${bgColor.a})`;
+      context.fill();
+      context.lineWidth = borderThickness;
+      context.strokeStyle = `rgba(${borderColor.r},${borderColor.g},${borderColor.b},${borderColor.a})`;
+      context.stroke();
       
-      // Center the text
-      ctx.font = fontsize + "px " + fontface;
-      ctx.fillStyle = "rgba(0,0,0,1.0)";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(msg, canvas.width/2, canvas.height/2);
+      // Center text
+      context.font = fontsize + "px " + fontface;
+      context.fillStyle = "rgba(0,0,0,1)";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(message, canvas.width / 2, canvas.height / 2);
       
       const texture = new THREE.Texture(canvas);
       texture.needsUpdate = true;
@@ -737,33 +737,35 @@ menu: nav/home.html
       const canvas = document.getElementById('travelSphere');
       sphereRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
       sphereRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
-      
       sphereScene = new THREE.Scene();
       sphereCamera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
       sphereCamera.position.z = 3;
       
-      const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
-      const sphereMat = new THREE.MeshStandardMaterial({ color: 0x007bff });
-      sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      // Globe
+      const geo = new THREE.SphereGeometry(1, 32, 32);
+      const mat = new THREE.MeshStandardMaterial({ color: 0x007bff });
+      sphereMesh = new THREE.Mesh(geo, mat);
       sphereScene.add(sphereMesh);
       
       // Light
       const light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(5,5,5);
+      light.position.set(5, 5, 5);
       sphereScene.add(light);
       
       // Markers
-      createNavigationMarker(Math.PI/2, Math.PI/4, "Home", "https://annie0523.github.io/travelor_frontend/");
-      createNavigationMarker(Math.PI/2, Math.PI/2, "Explore", "https://annie0523.github.io/travelor_frontend/explore");
-      createNavigationMarker(Math.PI/2, 3*Math.PI/4, "Profile", "https://annie0523.github.io/travelor_frontend/profile");
+      createNavigationMarker(Math.PI / 2, Math.PI / 4, "Home", "https://annie0523.github.io/travelor_frontend/");
+      createNavigationMarker(Math.PI / 2, Math.PI / 2, "Explore", "https://annie0523.github.io/travelor_frontend/explore");
+      createNavigationMarker(Math.PI / 2, 3 * Math.PI / 4, "Profile", "https://annie0523.github.io/travelor_frontend/profile");
       
-      addGlobeDragControls();
+      handleDragAndClick();
       animateSphere();
     }
+    
     function animateSphere() {
       requestAnimationFrame(animateSphere);
       sphereRenderer.render(sphereScene, sphereCamera);
     }
+    
     window.addEventListener('resize', () => {
       const canvas = document.getElementById('travelSphere');
       sphereRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
@@ -771,13 +773,13 @@ menu: nav/home.html
       sphereCamera.updateProjectionMatrix();
     });
     
-    function addGlobeDragControls() {
-      let mouseDown = false;
-      let isDragging = false;
-      let startX = 0, startY = 0;
-      const threshold = 5;
+    /* Drag to rotate the globe */
+    let mouseDown = false;
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    const threshold = 5;
+    function handleDragAndClick() {
       const globeCanvas = document.getElementById('travelSphere');
-      
       globeCanvas.addEventListener('mousedown', e => {
         mouseDown = true;
         isDragging = false;
@@ -792,9 +794,13 @@ menu: nav/home.html
           isDragging = true;
         }
         if (isDragging) {
-          const rotation = new THREE.Quaternion()
-            .setFromEuler(new THREE.Euler(toRadians(dy * 0.5), toRadians(dx * 0.5), 0, 'XYZ'));
-          sphereMesh.quaternion.multiplyQuaternions(rotation, sphereMesh.quaternion);
+          const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(
+            toRadians(dy * 0.5),
+            toRadians(dx * 0.5),
+            0,
+            'XYZ'
+          ));
+          sphereMesh.quaternion.multiplyQuaternions(q, sphereMesh.quaternion);
           startX = e.clientX;
           startY = e.clientY;
         }
@@ -802,10 +808,10 @@ menu: nav/home.html
       globeCanvas.addEventListener('mouseup', e => {
         mouseDown = false;
         if (!isDragging) {
-          // This was a click
+          // treat as click
           const mouse = new THREE.Vector2(
-            ( e.clientX / window.innerWidth ) * 2 - 1,
-            - ( e.clientY / window.innerHeight ) * 2 + 1
+            (e.clientX / window.innerWidth)*2 - 1,
+            -(e.clientY / window.innerHeight)*2 + 1
           );
           const raycaster = new THREE.Raycaster();
           raycaster.setFromCamera(mouse, sphereCamera);
@@ -820,20 +826,19 @@ menu: nav/home.html
         mouseDown = false;
       });
     }
-    function toRadians(deg) {
-      return deg * (Math.PI / 180);
-    }
+    function toRadians(angle) { return angle * (Math.PI / 180); }
+    
     initSphere();
     
     /* Hero Slider */
     const slidesEl = document.getElementById('slides');
     let currentSlide = 0;
     const totalSlides = slidesEl.children.length;
-    function showSlide(idx) {
-      if (idx < 0) currentSlide = totalSlides - 1;
-      else if (idx >= totalSlides) currentSlide = 0;
-      else currentSlide = idx;
-      slidesEl.style.transform = `translateX(-${currentSlide * 100}%)`;
+    function showSlide(i) {
+      if (i < 0) currentSlide = totalSlides-1;
+      else if (i >= totalSlides) currentSlide = 0;
+      else currentSlide = i;
+      slidesEl.style.transform = `translateX(-${currentSlide*100}%)`;
     }
     window.nextSlide = () => showSlide(currentSlide + 1);
     window.prevSlide = () => showSlide(currentSlide - 1);
@@ -849,10 +854,10 @@ menu: nav/home.html
       document.getElementById('lightboxModal').style.display = 'none';
     };
     
-    /* Stats Animation */
+    /* Stats Counters */
     function animateCounter(id, start, end, duration) {
       let current = start;
-      const increment = (end - start) / (duration / 50);
+      const increment = (end - start)/(duration/50);
       const el = document.getElementById(id);
       const timer = setInterval(() => {
         current += increment;
@@ -863,9 +868,9 @@ menu: nav/home.html
         el.textContent = Math.floor(current);
       }, 50);
     }
-    animateCounter('destCount', 0, 50, 2000);
-    animateCounter('travelerCount', 0, 100, 2000);
-    animateCounter('reviewCount', 0, 10, 2000);
+    animateCounter('destCount',0,50,2000);
+    animateCounter('travelerCount',0,100,2000);
+    animateCounter('reviewCount',0,10,2000);
     
     /* Rotating Travel Tips */
     const travelTips = [
@@ -883,17 +888,17 @@ menu: nav/home.html
     let tipIndex = 0;
     const travelTipEl = document.getElementById('travelTip');
     setInterval(() => {
-      tipIndex = (tipIndex + 1) % travelTips.length;
+      tipIndex = (tipIndex+1) % travelTips.length;
       travelTipEl.textContent = travelTips[tipIndex];
-    }, 7000);
+    },7000);
     
     /* FAQ Accordion */
     window.toggleFAQ = function(elem) {
       const answer = elem.nextElementSibling;
-      answer.style.display = (answer.style.display === 'block') ? 'none' : 'block';
+      answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
     };
     
-    /* Newsletter Modal */
+    /* Newsletter */
     window.subscribeNewsletter = function() {
       alert("Thank you for subscribing!");
       closeNewsletterModal();
@@ -902,7 +907,7 @@ menu: nav/home.html
       document.getElementById('newsletterModal').style.display = 'none';
     };
     
-    /* Chatbot (Travelor AI) with Safe Fetch */
+    /* Chatbot (Travelor AI) */
     const chatbotToggle = document.getElementById('chatbot-toggle');
     const chatbotDiv = document.getElementById('chatbot');
     const chatbotMessages = document.getElementById('chatbot-messages');
@@ -913,21 +918,21 @@ menu: nav/home.html
     });
     
     function appendChatMessage(sender, text) {
-      const msgDiv = document.createElement('div');
-      msgDiv.style.marginBottom = '10px';
-      msgDiv.style.textAlign = (sender === "Travelor AI") ? "left" : "right";
-      msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
-      chatbotMessages.appendChild(msgDiv);
+      const msg = document.createElement('div');
+      msg.style.marginBottom = '10px';
+      msg.style.textAlign = (sender==="Travelor AI"?"left":"right");
+      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatbotMessages.appendChild(msg);
       chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
     
     window.sendChatbotMessage = function() {
       const userText = chatbotUserInput.value.trim();
-      if (!userText) return;
+      if(!userText) return;
       appendChatMessage("You", userText);
       chatbotUserInput.value = '';
       
-      // Show loading bar
+      // Loading bar
       const loadingBar = document.createElement('div');
       loadingBar.className = 'loading-bar';
       chatbotMessages.appendChild(loadingBar);
@@ -936,56 +941,53 @@ menu: nav/home.html
       fetch(`${URL}/api/chatbot`, {
         ...safeFetchOptions,
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userText })
       })
-      .then(resp => {
-        if (!resp.ok) {
-          throw new Error("Chatbot request failed: " + resp.statusText);
-        }
+      .then(resp=>{
+        if(!resp.ok) throw new Error("Chatbot request failed: " + resp.statusText);
         return resp.json();
       })
-      .then(data => {
-        if (chatbotMessages.contains(loadingBar)) {
+      .then(data=>{
+        if(chatbotMessages.contains(loadingBar)) {
           chatbotMessages.removeChild(loadingBar);
         }
-        if (data.error) {
-          appendChatMessage("Travelor AI", "Error: " + data.error);
+        if(data.error) {
+          appendChatMessage("Travelor AI","Error: "+data.error);
         } else {
           appendChatMessage("Travelor AI", data.reply);
         }
       })
-      .catch(err => {
+      .catch(err=>{
         console.error(err);
-        if (chatbotMessages.contains(loadingBar)) {
+        if(chatbotMessages.contains(loadingBar)) {
           chatbotMessages.removeChild(loadingBar);
         }
-        appendChatMessage("Travelor AI", "Error contacting chatbot. Please try again.");
+        appendChatMessage("Travelor AI","Error contacting chatbot. Please try again.");
       });
     };
     
     // Draggable Chatbot
     const chatbotHeader = document.getElementById('chatbot-header');
-    let offsetX = 0, offsetY = 0, initialX = 0, initialY = 0;
+    let offsetX=0, offsetY=0, initialX=0, initialY=0;
     
-    chatbotHeader.addEventListener('mousedown', dragStart);
-    function dragStart(e) {
+    chatbotHeader.addEventListener('mousedown', e=>{
       e.preventDefault();
-      initialX = e.clientX;
-      initialY = e.clientY;
+      initialX=e.clientX; 
+      initialY=e.clientY;
       document.addEventListener('mousemove', dragMove);
       document.addEventListener('mouseup', dragEnd);
-    }
-    function dragMove(e) {
+    });
+    function dragMove(e){
       e.preventDefault();
-      offsetX = initialX - e.clientX;
-      offsetY = initialY - e.clientY;
-      initialX = e.clientX;
-      initialY = e.clientY;
-      chatbotDiv.style.top = (chatbotDiv.offsetTop - offsetY) + "px";
-      chatbotDiv.style.left = (chatbotDiv.offsetLeft - offsetX) + "px";
+      offsetX=initialX - e.clientX;
+      offsetY=initialY - e.clientY;
+      initialX=e.clientX;
+      initialY=e.clientY;
+      chatbotDiv.style.top = (chatbotDiv.offsetTop - offsetY)+"px";
+      chatbotDiv.style.left= (chatbotDiv.offsetLeft - offsetX)+"px";
     }
-    function dragEnd() {
+    function dragEnd(){
       document.removeEventListener('mousemove', dragMove);
       document.removeEventListener('mouseup', dragEnd);
     }
@@ -996,52 +998,48 @@ menu: nav/home.html
     const commentList = document.getElementById('comment-list');
     const comments = [];
     
-    window.openCommentModal = function() {
-      commentModal.style.display = 'flex';
+    window.openCommentModal = function(){
+      commentModal.style.display='flex';
     };
-    window.closeCommentModal = function() {
-      commentModal.style.display = 'none';
-      commentInput.value = '';
+    window.closeCommentModal = function(){
+      commentModal.style.display='none';
+      commentInput.value='';
     };
-    
-    window.submitComment = async function() {
-      const cmt = commentInput.value.trim();
-      if (!cmt) return;
+    window.submitComment = async function(){
+      const cmt= commentInput.value.trim();
+      if(!cmt)return;
       try {
-        await fetch(`${URL}/api/comment`, {
+        await fetch(`${URL}/api/comment`,{
           ...safeFetchOptions,
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ comment: cmt })
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({comment:cmt})
         });
         await fetchComments();
-      } catch (err) {
-        console.error("Error adding comment:", err);
+      } catch(err){
+        console.error("Error adding comment:",err);
       }
       closeCommentModal();
     };
-    
-    window.fetchComments = async function() {
+    window.fetchComments = async function(){
       try {
-        const res = await fetch(`${URL}/api/comment`, safeFetchOptions);
-        const data = await res.json();
-        comments.length = 0;
+        const res=await fetch(`${URL}/api/comment`, safeFetchOptions);
+        const data=await res.json();
+        comments.length=0;
         comments.push(...data);
         renderComments();
-      } catch (err) {
+      } catch(err){
         console.error("Error fetching comments:", err);
       }
     };
-    window.renderComments = function() {
-      commentList.innerHTML = '';
-      comments.forEach(c => {
-        const li = document.createElement('li');
-        li.textContent = c;
+    window.renderComments = function(){
+      commentList.innerHTML='';
+      comments.forEach(entry=>{
+        const li=document.createElement('li');
+        li.textContent=entry;
         commentList.appendChild(li);
       });
     };
-    
-    // On page load, fetch the comments
     document.addEventListener('DOMContentLoaded', fetchComments);
   </script>
 </body>
