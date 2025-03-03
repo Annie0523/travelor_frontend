@@ -675,7 +675,7 @@ menu: nav/home.html
       chatbotMessages.appendChild(loadingBar);
       chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
       
-      fetch("http://localhost:8402/api/chatbot", {
+      fetch(`${pythonURI}/api/chatbot`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         credentials: "omit", 
