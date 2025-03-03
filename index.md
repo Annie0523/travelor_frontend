@@ -7,6 +7,7 @@ hide: true
 menu: nav/home.html
 ---
 
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -479,8 +480,78 @@ menu: nav/home.html
       0% { transform: translateX(-100%); }
       100% { transform: translateX(100%); }
     }
+
+    /* ------------------------------------- */
+    /* BELOW: Original Comment Section Styles */
+    /* (copied exactly from old snippet)      */
+    /* ------------------------------------- */
+
+    .comment-section {
+      text-align: center;
+      margin-top: 50px;
+    }
+    .comment-section button {
+      padding: 10px 20px;
+      background-color: #0288d1;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .comment-section button:hover {
+      background-color: #0277bd;
+    }
+    #comment-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    #comment-modal .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      text-align: center;
+    }
+    #comment-modal textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 20px;
+    }
+    #comment-modal button {
+      padding: 10px 20px;
+      background-color: #03a9f4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #comment-modal button:hover {
+      background-color: #0288d1;
+    }
+    .comment-list {
+      margin-top: 20px;
+      padding: 0 50px;
+      list-style-type: none;
+    }
+    .comment-list li {
+      background: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
+
 <body>
   <!-- Chatbot Toggle Button -->
   <button id="chatbot-toggle">💬</button>
@@ -644,21 +715,23 @@ menu: nav/home.html
     </div>
   </div>
 
-  <!-- EXACT "Leave a Comment" Feature -->
-  <section class="comment-section" style="text-align:center; margin-top:40px;">
+  <!-- EXACT REPLACEMENT: Old Snippet Comment Section -->
+  <!-- Leave a Comment Section -->
+  <section class="comment-section">
     <button onclick="openCommentModal()">Leave a Comment</button>
-    <ul id="comment-list" class="comment-list" style="list-style:none; margin:20px auto 40px; padding:0; max-width:600px;"></ul>
+    <ul class="comment-list" id="comment-list"></ul>
   </section>
-  <div id="comment-modal"
-       style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-              background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-    <div class="modal-content" style="background:#fff; padding:20px; border-radius:8px; width:300px; text-align:center;">
-      <textarea id="comment-input" placeholder="Enter your comment"
-                style="width:100%; height:80px; margin-bottom:10px;"></textarea>
+
+  <!-- Comment Modal -->
+  <div id="comment-modal">
+    <div class="modal-content">
+      <textarea id="comment-input" placeholder="Enter your comment"></textarea>
       <button onclick="submitComment()">Submit</button>
       <button onclick="closeCommentModal()">Close</button>
     </div>
   </div>
+
+  <!-- End of Body Content -->
 
   <script type="module">
     // Inline configuration for API endpoints
@@ -667,7 +740,7 @@ menu: nav/home.html
     const safeFetchOptions = { ...fetchOptions, credentials: 'omit' };
     const baseURL = pythonURI.endsWith('/') ? pythonURI.slice(0, -1) : pythonURI;
     const URL = baseURL;
-    
+
     /* Hamburger Menu Toggle */
     function toggleMobileNav() {
       const mobileNav = document.getElementById('mobileNav');
@@ -989,56 +1062,69 @@ menu: nav/home.html
       document.removeEventListener('mousemove', dragMove);
       document.removeEventListener('mouseup', dragEnd);
     }
+  </script>
+
+  <!-- Old snippet's 1:1 JS for Comment Feature -->
+  <script type="module">
+    import { pythonURI } from './assets/js/api/config.js';
     
-    /* EXACT "Leave a Comment" Feature */
     const commentModal = document.getElementById('comment-modal');
     const commentInput = document.getElementById('comment-input');
     const commentList = document.getElementById('comment-list');
     const comments = [];
-    
-    window.openCommentModal = function(){
-      commentModal.style.display='flex';
-    };
-    window.closeCommentModal = function(){
-      commentModal.style.display='none';
-      commentInput.value='';
-    };
-    window.submitComment = async function(){
-      const cmt= commentInput.value.trim();
-      if(!cmt)return;
-      try {
-        await fetch(`${URL}/api/comment`,{
-          ...safeFetchOptions,
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({comment:cmt})
+
+    const API_URL = pythonURI + '/api/comment'; // from old snippet
+
+    // Open the comment modal
+    window.openCommentModal = function() {
+      commentModal.style.display = 'flex';
+    }
+
+    // Close the comment modal
+    window.closeCommentModal = function() {
+      commentModal.style.display = 'none';
+      commentInput.value = ''; // Clear the input field
+    }
+
+    // Submit the comment to the backend
+    window.submitComment = async function() {
+      const comment = commentInput.value.trim();
+      if (comment) {
+        // Send the comment to the backend
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ "comment": comment })
         });
+        // Fetch and render comments again
         await fetchComments();
-      } catch(err){
-        console.error("Error adding comment:",err);
+        closeCommentModal();
       }
-      closeCommentModal();
-    };
-    window.fetchComments = async function(){
-      try {
-        const res=await fetch(`${URL}/api/comment`, safeFetchOptions);
-        const data=await res.json();
-        comments.length=0;
-        comments.push(...data);
-        renderComments();
-      } catch(err){
-        console.error("Error fetching comments:", err);
-      }
-    };
-    window.renderComments = function(){
-      commentList.innerHTML='';
-      comments.forEach(entry=>{
-        const li=document.createElement('li');
-        li.textContent=entry;
+    }
+
+    // Fetch and render comments from the backend
+    window.fetchComments = async function() {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      comments.length = 0; // Clear the local array
+      comments.push(...data); // Update local array
+      renderComments();
+    }
+
+    // Render the comments in the list
+    window.renderComments = function() {
+      commentList.innerHTML = '';
+      comments.forEach(comment => {
+        const li = document.createElement('li');
+        li.textContent = comment;
         commentList.appendChild(li);
       });
-    };
-    document.addEventListener('DOMContentLoaded', fetchComments);
+    }
+
+    // Fetch and render comments on page load
+    fetchComments();
   </script>
 </body>
 </html>
