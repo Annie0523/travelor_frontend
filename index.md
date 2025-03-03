@@ -338,6 +338,9 @@ menu: nav/home.html
     <img id="lightboxImg" src="" alt="Enlarged image">
   </div>
   
+  <!-- ** Bring Back "Explore Vacations" Button ** -->
+  <button onclick="window.location.href='https://annie0523.github.io/travelor_frontend/vacations'">🌍 Explore Vacations</button>
+  
   <!-- Stats Section -->
   <section class="stats">
     <div class="stat">
@@ -622,9 +625,9 @@ menu: nav/home.html
         obj.textContent = Math.floor(current);
       }, 50);
     }
-    animateCounter('destCount', 0, 120, 2000);
-    animateCounter('travelerCount', 0, 500, 2000);
-    animateCounter('reviewCount', 0, 320, 2000);
+    animateCounter('destCount', 0, 50, 2000);
+    animateCounter('travelerCount', 0, 100, 2000);
+    animateCounter('reviewCount', 0, 10, 2000);
     
     /* Travel Tips Rotation */
     const travelTips = [
@@ -641,7 +644,10 @@ menu: nav/home.html
     ];
     let tipIndex = 0;
     const travelTipEl = document.getElementById('travelTip');
-    setInterval(() => { tipIndex = (tipIndex + 1) % travelTips.length; travelTipEl.textContent = travelTips[tipIndex]; }, 7000);
+    setInterval(() => {
+      tipIndex = (tipIndex + 1) % travelTips.length;
+      travelTipEl.textContent = travelTips[tipIndex];
+    }, 7000);
     
     /* --- New Chatbot (Travelor AI) Integration --- */
     const toggleButton = document.getElementById('chatbot-toggle');
@@ -675,7 +681,7 @@ menu: nav/home.html
       chatbotMessages.appendChild(loadingBar);
       chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
       
-      fetch(`${pythonURI}/api/chatbot`, {
+      fetch("http://localhost:8402/api/chatbot", {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         credentials: "omit", 
@@ -702,7 +708,7 @@ menu: nav/home.html
             chatbotMessages.removeChild(loadingBar);
           }
           console.error(err);
-          appendChatMessage("Travelor AI", "Error: Could not retrieve response.");
+          appendChatMessage("Travelor AI", "Check our website for more information on that!");
       });
     };
     
@@ -736,6 +742,84 @@ menu: nav/home.html
       document.removeEventListener('mouseup', closeDragElement);
       document.removeEventListener('mousemove', elementDrag);
     }
+  </script>
+
+  <!-- ** Bring Back the EXACT "Leave a Comment" Feature ** -->
+  <!-- Leave a Comment Section -->
+  <section class="comment-section">
+    <button onclick="openCommentModal()">Leave a Comment</button>
+    <ul class="comment-list" id="comment-list"></ul>
+  </section>
+
+  <!-- Comment Modal -->
+  <div id="comment-modal">
+    <div class="modal-content">
+      <textarea id="comment-input" placeholder="Enter your comment"></textarea>
+      <button onclick="submitComment()">Submit</button>
+      <button onclick="closeCommentModal()">Close</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { pythonURI } from './assets/js/api/config.js';
+
+    const commentModal = document.getElementById('comment-modal');
+    const commentInput = document.getElementById('comment-input');
+    const commentList = document.getElementById('comment-list');
+    const comments = [];
+
+
+    const API_URL = pythonURI + '/api/comment';  // Use your local IP address here
+
+    // Open the comment modal
+    window.openCommentModal = function() {
+      commentModal.style.display = 'flex';
+    }
+
+    // Close the comment modal
+    window.closeCommentModal = function() {
+      commentModal.style.display = 'none';
+      commentInput.value = '';  // Clear the input field
+    }
+
+    // Submit the comment to the backend
+    window.submitComment = async function() {
+      const comment = commentInput.value.trim();
+      if (comment) {
+        // Send the comment to the backend
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ "comment": comment })
+        });
+
+        // Fetch and render comments again
+        await fetchComments();
+        closeCommentModal();
+      }
+    }
+
+    // Fetch and render comments from the backend
+    window.fetchComments = async function() {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      comments.length = 0;  // Clear the local array
+      comments.push(...data);  // Update local array
+      renderComments();
+    }
+
+    // Render the comments in the list
+    window.renderComments = function() {
+      commentList.innerHTML = '';
+      comments.forEach(comment => {
+        const li = document.createElement('li');
+        li.textContent = comment;
+        commentList.appendChild(li);
+      });
+    }
+
+    // Fetch and render comments on page load
+    fetchComments();
   </script>
 </body>
 </html>
