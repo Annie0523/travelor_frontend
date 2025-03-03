@@ -661,11 +661,9 @@ menu: nav/home.html
   </div>
 
   <script type="module">
-    /*******************************************************************
-      Import pythonURI and fetchOptions, then build safeFetchOptions
-      to ensure the same approach as your 'explore' template.
-    *******************************************************************/
-    import { pythonURI, fetchOptions } from './assets/js/api/config.js';
+    // Inline configuration for API endpoints
+    const pythonURI = "http://127.0.0.1:8402";
+    const fetchOptions = {};
     const safeFetchOptions = { ...fetchOptions, credentials: 'omit' };
     const baseURL = pythonURI.endsWith('/') ? pythonURI.slice(0, -1) : pythonURI;
     const URL = baseURL;
