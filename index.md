@@ -57,7 +57,6 @@ menu: nav/home.html
       margin-bottom: 40px;
     }
     #travelSphere { width: 100%; height: 100%; border-radius: 20px; }
-    /* Hint message for dragging */
     #dragHint {
       font-size: 0.9rem;
       color: #555;
@@ -119,6 +118,22 @@ menu: nav/home.html
     }
     #lightboxModal img { max-width: 90%; max-height: 90%; border-radius: 15px; }
     
+    /* Button: Explore Vacations */
+    button.explore-vacations {
+      margin: 30px 50px;
+      background-color: #26a69a;
+      border: none;
+      border-radius: 20px;
+      color: #fff;
+      padding: 12px 24px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button.explore-vacations:hover {
+      background-color: #21978b;
+    }
+    
     /* Stats Section */
     .stats { display: flex; justify-content: center; gap: 40px; background: #e0f7fa; padding: 40px 20px; }
     .stat { text-align: center; }
@@ -160,8 +175,7 @@ menu: nav/home.html
     }
     #newsletterModal button:hover { background: #0056b3; }
     
-    /* New Chatbot Widget (Travelor AI) CSS */
-    /* Floating Toggle Button */
+    /* Chatbot Widget (Travelor AI) */
     #chatbot-toggle {
       position: fixed;
       bottom: 20px;
@@ -177,8 +191,6 @@ menu: nav/home.html
       z-index: 1000;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-    
-    /* Chatbot Widget Container */
     #chatbot {
       position: fixed;
       bottom: 90px;
@@ -196,8 +208,6 @@ menu: nav/home.html
       z-index: 1000;
       cursor: move;
     }
-    
-    /* Chatbot Header & Input */
     #chatbot-header {
       background: #007bff;
       color: white;
@@ -233,8 +243,6 @@ menu: nav/home.html
       transition: background 0.3s;
     }
     #chatbot-input button:hover { background: #0056b3; }
-    
-    /* Loading bar for chatbot */
     .loading-bar {
       width: 100%;
       height: 5px;
@@ -270,7 +278,7 @@ menu: nav/home.html
     </div>
   </header>
   
-  <!-- Interactive Travel Sphere with Embedded Navigation Markers -->
+  <!-- Interactive Travel Sphere -->
   <section id="travelSphereContainer">
     <canvas id="travelSphere"></canvas>
     <div id="dragHint">Click and drag the globe to rotate (avoid moving too fast to prevent accidental clicks)</div>
@@ -305,7 +313,7 @@ menu: nav/home.html
     </div>
   </section>
   
-  <!-- Featured Destinations Cards with Lightbox -->
+  <!-- Featured Destinations -->
   <section>
     <h2 class="section-title">Featured Destinations</h2>
     <div class="card-container">
@@ -338,8 +346,10 @@ menu: nav/home.html
     <img id="lightboxImg" src="" alt="Enlarged image">
   </div>
   
-  <!-- ** Bring Back "Explore Vacations" Button ** -->
-  <button onclick="window.location.href='https://annie0523.github.io/travelor_frontend/vacations'">🌍 Explore Vacations</button>
+  <!-- Explore Vacations Button -->
+  <button class="explore-vacations" onclick="window.location.href='https://annie0523.github.io/travelor_frontend/vacations'">
+    🌍 Explore Vacations
+  </button>
   
   <!-- Stats Section -->
   <section class="stats">
@@ -410,78 +420,77 @@ menu: nav/home.html
   </div>
   
   <script type="module">
-    import { pythonURI } from './assets/js/api/config.js';
-    
-    /* Hamburger Menu Toggle */
+    /*******************************************************************
+      Import pythonURI and fetchOptions, then build safeFetchOptions
+      to ensure the same approach as your 'explore' template.
+    *******************************************************************/
+    import { pythonURI, fetchOptions } from './assets/js/api/config.js';
+    const safeFetchOptions = { ...fetchOptions, credentials: 'omit' };
+    const baseURL = pythonURI.endsWith('/') ? pythonURI.slice(0, -1) : pythonURI;
+    const URL = baseURL;
+
+    /* Hamburger Menu */
     function toggleMobileNav() {
       const mobileNav = document.getElementById('mobileNav');
       mobileNav.style.display = (mobileNav.style.display === 'flex') ? 'none' : 'flex';
     }
     window.toggleMobileNav = toggleMobileNav;
     
-    /* --- Interactive Travel Sphere with Embedded Navigation Markers --- */
+    /* Travel Sphere Setup */
     let sphereScene, sphereCamera, sphereRenderer, sphereMesh;
     const markers = [];
     
-    // Create a text sprite drawn as an oval (to mimic a country's shape)
-    function createTextSprite(message, parameters) {
-      parameters = parameters || {};
-      const fontface = parameters.fontface || "Arial";
-      const fontsize = parameters.fontsize || 32;
-      const borderThickness = parameters.borderThickness || 4;
-      const borderColor = parameters.borderColor || { r:0, g:0, b:0, a:1.0 };
-      const backgroundColor = parameters.backgroundColor || { r:255, g:255, b:255, a:1.0 };
+    // Reusable text sprite
+    function createTextSprite(content, opts = {}) {
+      const fontface = opts.fontface || "Arial";
+      const fontsize = opts.fontsize || 32;
+      const borderThickness = opts.borderThickness || 4;
+      const borderColor = opts.borderColor || { r:0, g:0, b:0, a:1.0 };
+      const bgColor = opts.backgroundColor || { r:255, g:255, b:255, a:1.0 };
       
       const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      // Measure text
-      context.font = fontsize + "px " + fontface;
-      const metrics = context.measureText(message);
+      const ctx = canvas.getContext('2d');
+      ctx.font = `${fontsize}px ${fontface}`;
+      const metrics = ctx.measureText(content);
       const textWidth = metrics.width;
-      // Set canvas dimensions with some padding
+      
       canvas.width = textWidth + borderThickness * 4;
       canvas.height = fontsize * 1.8 + borderThickness * 4;
       
-      // Draw an oval shape
-      context.beginPath();
-      context.ellipse(canvas.width/2, canvas.height/2, canvas.width/2, canvas.height/2, 0, 0, 2 * Math.PI);
-      context.fillStyle = `rgba(${backgroundColor.r},${backgroundColor.g},${backgroundColor.b},${backgroundColor.a})`;
-      context.fill();
-      context.lineWidth = borderThickness;
-      context.strokeStyle = `rgba(${borderColor.r},${borderColor.g},${borderColor.b},${borderColor.a})`;
-      context.stroke();
+      // Draw an oval shape in the background
+      ctx.beginPath();
+      ctx.ellipse(canvas.width/2, canvas.height/2, canvas.width/2, canvas.height/2, 0, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(${bgColor.r},${bgColor.g},${bgColor.b},${bgColor.a})`;
+      ctx.fill();
+      ctx.lineWidth = borderThickness;
+      ctx.strokeStyle = `rgba(${borderColor.r},${borderColor.g},${borderColor.b},${borderColor.a})`;
+      ctx.stroke();
       
-      // Draw the text in the center
-      context.font = fontsize + "px " + fontface;
-      context.fillStyle = "rgba(0,0,0,1.0)";
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-      context.fillText(message, canvas.width / 2, canvas.height / 2);
+      // Center text
+      ctx.font = `${fontsize}px ${fontface}`;
+      ctx.fillStyle = "rgba(0,0,0,1.0)";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(content, canvas.width / 2, canvas.height / 2);
       
       const texture = new THREE.Texture(canvas);
       texture.needsUpdate = true;
-      
-      // Use default depth testing so the marker is occluded when behind the globe.
-      const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
-      const sprite = new THREE.Sprite(spriteMaterial);
-      // Adjust scale for a smaller size.
+      const spriteMat = new THREE.SpriteMaterial({ map: texture });
+      const sprite = new THREE.Sprite(spriteMat);
       sprite.scale.set(canvas.width / 150, canvas.height / 150, 1);
       return sprite;
     }
     
-    // Create a navigation marker on the globe with green styling.
-    function createNavigationMarker(phi, theta, label, url) {
-      const sprite = createTextSprite(label, { 
-        fontsize: 32, 
+    // Add clickable markers
+    function addMarker(phi, theta, label, link) {
+      const sprite = createTextSprite(label, {
+        fontsize: 32,
         borderThickness: 4,
         backgroundColor: { r:34, g:139, b:34, a:1.0 },
         borderColor: { r:0, g:100, b:0, a:1.0 }
       });
-      sprite.name = label;
-      sprite.userData = { url: url };
-      // Place the marker slightly outside the globe (radius = 1.1)
+      sprite.userData = { link: link };
       sprite.position.setFromSphericalCoords(1.1, phi, theta);
-      // Add the marker as a child of the globe so it rotates with it.
       sphereMesh.add(sprite);
       markers.push(sprite);
     }
@@ -494,29 +503,27 @@ menu: nav/home.html
       sphereCamera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
       sphereCamera.position.z = 3;
       
-      // Create the globe.
-      const geometry = new THREE.SphereGeometry(1, 32, 32);
-      const material = new THREE.MeshStandardMaterial({ color: 0x007bff });
-      sphereMesh = new THREE.Mesh(geometry, material);
+      const globeGeo = new THREE.SphereGeometry(1, 32, 32);
+      const globeMat = new THREE.MeshStandardMaterial({ color: 0x007bff });
+      sphereMesh = new THREE.Mesh(globeGeo, globeMat);
       sphereScene.add(sphereMesh);
       
-      // Add a directional light.
-      const light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(5, 5, 5);
-      sphereScene.add(light);
+      // Light
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+      dirLight.position.set(5, 5, 5);
+      sphereScene.add(dirLight);
       
-      // Create navigation markers on the front hemisphere.
-      createNavigationMarker(Math.PI / 2, Math.PI / 4, "Home", "https://annie0523.github.io/travelor_frontend/");
-      createNavigationMarker(Math.PI / 2, Math.PI / 2, "Explore", "https://annie0523.github.io/travelor_frontend/explore");
-      createNavigationMarker(Math.PI / 2, 3 * Math.PI / 4, "Profile", "https://annie0523.github.io/travelor_frontend/profile");
+      // Markers
+      addMarker(Math.PI / 2, Math.PI / 4, "Home", "https://annie0523.github.io/travelor_frontend/");
+      addMarker(Math.PI / 2, Math.PI / 2, "Explore", "https://annie0523.github.io/travelor_frontend/explore");
+      addMarker(Math.PI / 2, 3 * Math.PI / 4, "Profile", "https://annie0523.github.io/travelor_frontend/profile");
       
-      initDragAndClick();
-      
-      animateSphere();
+      handleDrag();
+      animate();
     }
     
-    function animateSphere() {
-      requestAnimationFrame(animateSphere);
+    function animate() {
+      requestAnimationFrame(animate);
       sphereRenderer.render(sphereScene, sphereCamera);
     }
     
@@ -527,110 +534,110 @@ menu: nav/home.html
       sphereCamera.updateProjectionMatrix();
     });
     
-    initSphere();
-    
-    /* --- Globe Interactivity: Click to Drag --- */
-    let mouseDown = false;
-    let isDragging = false;
-    let startX = 0, startY = 0;
-    const clickThreshold = 5;
-    const globeCanvas = document.getElementById('travelSphere');
-    
-    globeCanvas.addEventListener('mousedown', (event) => {
-      mouseDown = true;
-      isDragging = false;
-      startX = event.clientX;
-      startY = event.clientY;
-    });
-    
-    globeCanvas.addEventListener('mousemove', (event) => {
-      if (!mouseDown) return;
-      const dx = event.clientX - startX;
-      const dy = event.clientY - startY;
-      if (!isDragging && Math.sqrt(dx*dx + dy*dy) > clickThreshold) {
-         isDragging = true;
-      }
-      if (isDragging) {
-         const deltaRotationQuaternion = new THREE.Quaternion()
-          .setFromEuler(new THREE.Euler(
+    function handleDrag() {
+      let mouseDown = false;
+      let isDragging = false;
+      let startX = 0, startY = 0;
+      const threshold = 5;
+      const globeCanvas = document.getElementById('travelSphere');
+      
+      globeCanvas.addEventListener('mousedown', e => {
+        mouseDown = true;
+        isDragging = false;
+        startX = e.clientX;
+        startY = e.clientY;
+      });
+      globeCanvas.addEventListener('mousemove', e => {
+        if(!mouseDown) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if(!isDragging && Math.sqrt(dx*dx + dy*dy) > threshold) {
+          isDragging = true;
+        }
+        if(isDragging) {
+          const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(
             toRadians(dy * 0.5),
             toRadians(dx * 0.5),
             0,
             'XYZ'
           ));
-         sphereMesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, sphereMesh.quaternion);
-         startX = event.clientX;
-         startY = event.clientY;
-      }
-    });
-    
-    globeCanvas.addEventListener('mouseup', (event) => {
-      mouseDown = false;
-      if (!isDragging) {
-         // Process as a click to check for marker selection.
-         const mouse = new THREE.Vector2();
-         mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-         mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-         const raycaster = new THREE.Raycaster();
-         raycaster.setFromCamera(mouse, sphereCamera);
-         const intersects = raycaster.intersectObjects(markers);
-         if (intersects.length > 0) {
-           const url = intersects[0].object.userData.url;
-           if (url) window.location.href = url;
-         }
-      }
-    });
-    
-    globeCanvas.addEventListener('mouseleave', () => {
-      mouseDown = false;
-    });
-    
+          sphereMesh.quaternion.multiplyQuaternions(q, sphereMesh.quaternion);
+          startX = e.clientX;
+          startY = e.clientY;
+        }
+      });
+      globeCanvas.addEventListener('mouseup', e => {
+        mouseDown = false;
+        if(!isDragging) {
+          // treat as a click
+          const mouse = new THREE.Vector2(
+            ( e.clientX / window.innerWidth ) * 2 - 1,
+            - ( e.clientY / window.innerHeight ) * 2 + 1
+          );
+          const raycaster = new THREE.Raycaster();
+          raycaster.setFromCamera(mouse, sphereCamera);
+          const hits = raycaster.intersectObjects(markers);
+          if(hits.length > 0) {
+            const link = hits[0].object.userData.link;
+            if(link) window.location.href = link;
+          }
+        }
+      });
+      globeCanvas.addEventListener('mouseleave', () => {
+        mouseDown = false;
+      });
+    }
     function toRadians(angle) {
       return angle * (Math.PI / 180);
     }
-    
-    function initDragAndClick() {
-      // Centralized drag/click handling already set up.
-    }
+
+    initSphere();
     
     /* Hero Slider */
     const slidesEl = document.getElementById('slides');
-    let currentSlide = 0, totalSlides = slidesEl.children.length;
-    function showSlide(index) {
-      if(index < 0) { currentSlide = totalSlides - 1; }
-      else if(index >= totalSlides) { currentSlide = 0; }
-      else { currentSlide = index; }
+    let currentSlide = 0;
+    const totalSlides = slidesEl.children.length;
+    
+    function showSlide(n) {
+      if(n < 0) currentSlide = totalSlides - 1;
+      else if(n >= totalSlides) currentSlide = 0;
+      else currentSlide = n;
       slidesEl.style.transform = `translateX(-${currentSlide * 100}%)`;
     }
-    window.nextSlide = () => { showSlide(currentSlide + 1); }
-    window.prevSlide = () => { showSlide(currentSlide - 1); }
-    setInterval(() => { showSlide(currentSlide + 1); }, 5000);
+    window.nextSlide = () => showSlide(currentSlide + 1);
+    window.prevSlide = () => showSlide(currentSlide - 1);
+    setInterval(() => showSlide(currentSlide + 1), 5000);
     
-    /* Lightbox for Cards */
-    function openLightbox(card) {
-      const imgSrc = card.querySelector('img').src;
-      document.getElementById('lightboxImg').src = imgSrc;
+    /* Lightbox */
+    window.openLightbox = function(card) {
+      const imageSrc = card.querySelector('img').src;
+      document.getElementById('lightboxImg').src = imageSrc;
       document.getElementById('lightboxModal').style.display = 'flex';
-    }
-    function closeLightbox() { document.getElementById('lightboxModal').style.display = 'none'; }
+    };
+    window.closeLightbox = function() {
+      document.getElementById('lightboxModal').style.display = 'none';
+    };
     
-    /* Animated Counters */
+    /* Stats Animation */
     function animateCounter(id, start, end, duration) {
       let current = start;
       const increment = (end - start) / (duration / 50);
-      const obj = document.getElementById(id);
+      const el = document.getElementById(id);
       const timer = setInterval(() => {
         current += increment;
-        if (current >= end) { current = end; clearInterval(timer); }
-        obj.textContent = Math.floor(current);
+        if(current >= end) {
+          current = end;
+          clearInterval(timer);
+        }
+        el.textContent = Math.floor(current);
       }, 50);
     }
     animateCounter('destCount', 0, 50, 2000);
     animateCounter('travelerCount', 0, 100, 2000);
     animateCounter('reviewCount', 0, 10, 2000);
     
-    /* Travel Tips Rotation */
-    const travelTips = [
+    /* Rotating Travel Tips */
+    const tips = [
       "Tip: Always check local weather before booking your trip!",
       "Tip: Research local transportation options to save time and money.",
       "Tip: Learn a few key phrases of the local language.",
@@ -642,184 +649,182 @@ menu: nav/home.html
       "Tip: Stay connected with local travel apps for real-time updates.",
       "Tip: Embrace the local culture to enrich your journey."
     ];
-    let tipIndex = 0;
-    const travelTipEl = document.getElementById('travelTip');
+    let tipIdx = 0;
+    const tipEl = document.getElementById('travelTip');
     setInterval(() => {
-      tipIndex = (tipIndex + 1) % travelTips.length;
-      travelTipEl.textContent = travelTips[tipIndex];
+      tipIdx = (tipIdx + 1) % tips.length;
+      tipEl.textContent = tips[tipIdx];
     }, 7000);
     
-    /* --- New Chatbot (Travelor AI) Integration --- */
-    const toggleButton = document.getElementById('chatbot-toggle');
-    const chatbotWidget = document.getElementById('chatbot');
-    toggleButton.addEventListener('click', () => {
-      chatbotWidget.style.display = (chatbotWidget.style.display === 'flex') ? 'none' : 'flex';
+    /* FAQ Accordion */
+    window.toggleFAQ = function(elem) {
+      const answer = elem.nextElementSibling;
+      answer.style.display = (answer.style.display === 'block') ? 'none' : 'block';
+    };
+    
+    /* Newsletter Modal (optional) */
+    window.subscribeNewsletter = function() {
+      alert("Thank you for subscribing!");
+      closeNewsletterModal();
+    };
+    window.closeNewsletterModal = function() {
+      document.getElementById('newsletterModal').style.display = 'none';
+    };
+    
+    /* Chatbot */
+    const chatbotToggle = document.getElementById('chatbot-toggle');
+    const chatbotDiv = document.getElementById('chatbot');
+    const chatbotMessages = document.getElementById('chatbot-messages');
+    const userInput = document.getElementById('chatbot-user-input');
+    
+    chatbotToggle.addEventListener('click', () => {
+      chatbotDiv.style.display = (chatbotDiv.style.display === 'flex') ? 'none' : 'flex';
     });
     
-    const chatbotMessages = document.getElementById('chatbot-messages');
-    const chatbotUserInput = document.getElementById('chatbot-user-input');
-    
-    function appendChatMessage(sender, text) {
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'chat-msg';
-      msgDiv.style.marginBottom = '10px';
-      msgDiv.style.textAlign = sender === "Travelor AI" ? "left" : "right";
-      msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
-      chatbotMessages.appendChild(msgDiv);
+    // Helper to add messages to the chatbot
+    function addMessage(author, text) {
+      const wrapper = document.createElement('div');
+      wrapper.style.marginBottom = '10px';
+      wrapper.style.textAlign = author === "Travelor AI" ? "left" : "right";
+      wrapper.innerHTML = `<strong>${author}:</strong> ${text}`;
+      chatbotMessages.appendChild(wrapper);
       chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
     
+    // Chatbot fetch
     window.sendChatbotMessage = function() {
-      const userText = chatbotUserInput.value.trim();
-      if (!userText) return;
-      appendChatMessage("You", userText);
-      chatbotUserInput.value = '';
+      const text = userInput.value.trim();
+      if(!text) return;
+      addMessage("You", text);
+      userInput.value = '';
       
-      // Show loading bar
+      // show loading
       const loadingBar = document.createElement('div');
       loadingBar.className = 'loading-bar';
       chatbotMessages.appendChild(loadingBar);
       chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
       
-      fetch("http://localhost:8402/api/chatbot", {
+      // Use our same safeFetchOptions approach
+      fetch(`${URL}/api/chatbot`, {
+        ...safeFetchOptions,
         method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        credentials: "omit", 
-        body: JSON.stringify({ message: userText })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
       })
-      .then(response => {
-          if (!response.ok) {
-              throw new Error("Network response was not ok: " + response.statusText);
-          }
-          return response.json();
+      .then(resp => {
+        if(!resp.ok) {
+          throw new Error("API error: " + resp.statusText);
+        }
+        return resp.json();
       })
       .then(data => {
-          if (chatbotMessages.contains(loadingBar)) {
-            chatbotMessages.removeChild(loadingBar);
-          }
-          if (data.error) {
-              appendChatMessage("Travelor AI", "Error: " + data.error);
-          } else {
-              appendChatMessage("Travelor AI", data.reply);
-          }
+        // remove loading bar
+        if(chatbotMessages.contains(loadingBar)) {
+          chatbotMessages.removeChild(loadingBar);
+        }
+        if(data.error) {
+          addMessage("Travelor AI", "Error: " + data.error);
+        } else {
+          addMessage("Travelor AI", data.reply);
+        }
       })
       .catch(err => {
-          if (chatbotMessages.contains(loadingBar)) {
-            chatbotMessages.removeChild(loadingBar);
-          }
-          console.error(err);
-          appendChatMessage("Travelor AI", "Check our website for more information on that!");
+        console.error(err);
+        if(chatbotMessages.contains(loadingBar)) {
+          chatbotMessages.removeChild(loadingBar);
+        }
+        addMessage("Travelor AI", "Hmm, can't process that right now. Please try again!");
       });
     };
     
-    // Make the Chatbot Widget Draggable using its header
-    const headerElem = document.getElementById('chatbot-header');
-    headerElem.addEventListener('mousedown', dragMouseDown);
+    // Draggable Chatbot
+    const dragHeader = document.getElementById('chatbot-header');
+    let offsetX = 0, offsetY = 0, initialX = 0, initialY = 0;
     
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    
-    function dragMouseDown(e) {
-      e = e || window.event;
+    dragHeader.addEventListener('mousedown', onDragStart);
+    function onDragStart(e) {
       e.preventDefault();
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      document.addEventListener('mouseup', closeDragElement);
-      document.addEventListener('mousemove', elementDrag);
+      initialX = e.clientX;
+      initialY = e.clientY;
+      document.addEventListener('mousemove', onDragMove);
+      document.addEventListener('mouseup', onDragEnd);
     }
-    
-    function elementDrag(e) {
-      e = e || window.event;
+    function onDragMove(e) {
       e.preventDefault();
-      pos1 = pos3 - e.clientX;
-      pos2 = pos4 - e.clientY;
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      chatbotWidget.style.top = (chatbotWidget.offsetTop - pos2) + "px";
-      chatbotWidget.style.left = (chatbotWidget.offsetLeft - pos1) + "px";
+      offsetX = initialX - e.clientX;
+      offsetY = initialY - e.clientY;
+      initialX = e.clientX;
+      initialY = e.clientY;
+      chatbotDiv.style.top = (chatbotDiv.offsetTop - offsetY) + "px";
+      chatbotDiv.style.left = (chatbotDiv.offsetLeft - offsetX) + "px";
+    }
+    function onDragEnd() {
+      document.removeEventListener('mousemove', onDragMove);
+      document.removeEventListener('mouseup', onDragEnd);
     }
     
-    function closeDragElement() {
-      document.removeEventListener('mouseup', closeDragElement);
-      document.removeEventListener('mousemove', elementDrag);
-    }
-  </script>
-
-  <!-- ** Bring Back the EXACT "Leave a Comment" Feature ** -->
-  <!-- Leave a Comment Section -->
-  <section class="comment-section">
-    <button onclick="openCommentModal()">Leave a Comment</button>
-    <ul class="comment-list" id="comment-list"></ul>
-  </section>
-
-  <!-- Comment Modal -->
-  <div id="comment-modal">
-    <div class="modal-content">
-      <textarea id="comment-input" placeholder="Enter your comment"></textarea>
-      <button onclick="submitComment()">Submit</button>
-      <button onclick="closeCommentModal()">Close</button>
-    </div>
-  </div>
-
-  <script type="module">
-    import { pythonURI } from './assets/js/api/config.js';
-
+    /* Comment Feature */
     const commentModal = document.getElementById('comment-modal');
     const commentInput = document.getElementById('comment-input');
     const commentList = document.getElementById('comment-list');
     const comments = [];
-
-
-    const API_URL = pythonURI + '/api/comment';  // Use your local IP address here
-
-    // Open the comment modal
+    
+    // EXACT "Leave a Comment" feature:
     window.openCommentModal = function() {
       commentModal.style.display = 'flex';
-    }
-
-    // Close the comment modal
+    };
     window.closeCommentModal = function() {
       commentModal.style.display = 'none';
-      commentInput.value = '';  // Clear the input field
-    }
-
-    // Submit the comment to the backend
+      commentInput.value = '';
+    };
     window.submitComment = async function() {
-      const comment = commentInput.value.trim();
-      if (comment) {
-        // Send the comment to the backend
-        await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ "comment": comment })
-        });
-
-        // Fetch and render comments again
-        await fetchComments();
-        closeCommentModal();
-      }
-    }
-
-    // Fetch and render comments from the backend
+      const cmt = commentInput.value.trim();
+      if(!cmt) return;
+      await fetch(`${URL}/api/comment`, {
+        ...safeFetchOptions,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comment: cmt })
+      });
+      await fetchComments();
+      closeCommentModal();
+    };
     window.fetchComments = async function() {
-      const response = await fetch(API_URL);
-      const data = await response.json();
-      comments.length = 0;  // Clear the local array
-      comments.push(...data);  // Update local array
-      renderComments();
-    }
-
-    // Render the comments in the list
+      try {
+        const response = await fetch(`${URL}/api/comment`, safeFetchOptions);
+        const data = await response.json();
+        comments.length = 0;
+        comments.push(...data);
+        renderComments();
+      } catch(err) {
+        console.error("Could not fetch comments:", err);
+      }
+    };
     window.renderComments = function() {
       commentList.innerHTML = '';
-      comments.forEach(comment => {
+      comments.forEach(entry => {
         const li = document.createElement('li');
-        li.textContent = comment;
+        li.textContent = entry;
         commentList.appendChild(li);
       });
-    }
-
-    // Fetch and render comments on page load
-    fetchComments();
+    };
+    // Initialize comment list on load
+    document.addEventListener('DOMContentLoaded', fetchComments);
   </script>
+  
+  <!-- The Comment Modal HTML -->
+  <div id="comment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div class="modal-content" style="background:#fff; padding:20px; border-radius:8px; width:300px; text-align:center;">
+      <textarea id="comment-input" placeholder="Enter your comment" style="width:100%; height:80px; margin-bottom:10px;"></textarea>
+      <button onclick="submitComment()">Submit</button>
+      <button onclick="closeCommentModal()">Close</button>
+    </div>
+  </div>
+  
+  <!-- "Leave a Comment" Button & List -->
+  <section class="comment-section" style="text-align:center; margin-top:40px;">
+    <button onclick="openCommentModal()">Leave a Comment</button>
+    <ul id="comment-list" class="comment-list" style="list-style:none; margin:20px auto 40px; padding:0; max-width:600px;"></ul>
+  </section>
 </body>
 </html>
